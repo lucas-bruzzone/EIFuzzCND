@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0a7c86c2-140a-45c3-93b8-f70fd99150e7" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/datasets/kyoto/kyoto-instances.arff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/datasets/kyoto/kyoto-train.arff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/datasets/kyoto/test.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/datasets/kyoto/training.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/datasets/moa/moa-instances.arff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/datasets/moa/moa-instances.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/datasets/moa/moa-train.arff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/datasets/moa/moa-train.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Evaluation/AcuraciaMedidas.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Evaluation/AnaliseErros.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Evaluation/ClassicMeasures.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Evaluation/ResultsForExample.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Evaluation/ResultsPFuzzND.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/FuzzyFunctions/DistanceMeasures.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/FuzzyFunctions/FuzzyFunctions.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/FuzzySystem.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/NotSupervisedModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Output/HandlesFiles.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Phases/OfflinePhase.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Phases/OnlinePhase.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Structs/Example.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/EIFuzzCND/Structs/SPFMiC.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2GH9jqNoc62ftN29PtxNehFAN7Q" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/lucas/Documents/KFuzzCND&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\lucas\Documents\EIFuzzCND\src\main\java\EIFuzzCND" />
+      <recent name="C:\Users\lucas\Documents\EIFuzzCND\datasets" />
+      <recent name="C:\Users\Lucas Bruzzone\IdeaProjects\EIFuzzCND\src" />
+      <recent name="C:\Users\Lucas Bruzzone\IdeaProjects\EIFuzzCND\src\main\java\EIFuzzCND\Models" />
+      <recent name="C:\Users\Lucas Bruzzone\IdeaProjects\EIFuzzCND\src\main\java\Models" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="EIFuzzCND.Models" />
+      <recent name="EIFuzzCND.Evaluation" />
+      <recent name="EIFuzzCND.Output" />
+      <recent name="EIFuzzCND.Phases" />
+      <recent name="EIFuzzCND" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="FuzzySystem" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="11" />
+      <option name="MAIN_CLASS_NAME" value="EIFuzzCND.FuzzySystem" />
+      <module name="EIFuzzCND" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="EIFuzzCND.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0a7c86c2-140a-45c3-93b8-f70fd99150e7" name="Changes" comment="" />
+      <created>1666034811369</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1666034811369</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>107</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>108</line>
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>120</line>
+          <option name="timeStamp" value="36" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>119</line>
+          <option name="timeStamp" value="37" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>115</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>114</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>111</line>
+          <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>112</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Phases/OfflinePhase.java</url>
+          <line>9</line>
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>103</line>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>102</line>
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/FuzzyFunctions/FuzzyFunctions.java</url>
+          <line>82</line>
+          <option name="timeStamp" value="50" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/FuzzyFunctions/FuzzyFunctions.java</url>
+          <line>75</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/FuzzyFunctions/FuzzyFunctions.java</url>
+          <line>90</line>
+          <option name="timeStamp" value="57" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>48</line>
+          <option name="timeStamp" value="58" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/EIFuzzCND/Models/SupervisedModel.java</url>
+          <line>49</line>
+          <option name="timeStamp" value="59" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="weka.core.converters.ArffLoader" memberName="m_URL" />
+        <PinnedItemInfo parentTag="weka.core.converters.ConverterUtils$DataSource" memberName="m_File" />
+      </pinned-members>
+    </pin-to-top-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="supervisedModel.N" />
+        <watch expression="supervisedModel" />
+        <watch expression="((java.util.ArrayList)((HashMap.Node)((HashMap)supervisedModel.classifier).entrySet().toArray()[1]).getValue()).get(3)" custom="java.util.HashMap.Node,java.util.HashMap,java.util.ArrayList" />
+        <watch expression="supervisedModel.N" />
+        <watch expression="supervisedModel" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>

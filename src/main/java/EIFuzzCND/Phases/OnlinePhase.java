@@ -1,0 +1,294 @@
+package EIFuzzCND.Phases;
+
+import EIFuzzCND.FuzzyFunctions.*;
+import EIFuzzCND.Models.*;
+import EIFuzzCND.Structs.*;
+import EIFuzzCND.Evaluation.*;
+import EIFuzzCND.Output.*;
+import org.apache.commons.math3.ml.clustering.CentroidCluster;
+import org.apache.commons.math3.ml.clustering.FuzzyKMeansClusterer;
+import weka.core.Attribute;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
+
+import java.util.*;
+
+public class OnlinePhase {
+    public List<Example> exemplosEsperandoTempo = new ArrayList<>();
+    double nPCount = 100;
+    double phi = 0;
+    int erroSeparado = 0;
+    int erroNs = 0;
+    SupervisedModel supervisedModel;
+    NotSupervisedModel notSupervisedModel;
+    boolean existNovelty = false;
+    List<Double> novelties = new ArrayList<>();
+    HashMap<String, AnaliseErros> analiseErros = new HashMap<>();
+    List<Example> results = new ArrayList<>();
+
+    public void initialize(String caminho, String dataset, SupervisedModel supervisedModel, int latencia, int tChunk, int T, int kShort, double phi, int ts, int minWeight) {
+
+        List<AcuraciaMedidas> acuracias = new ArrayList<>();
+        this.supervisedModel = supervisedModel;
+        this.phi = phi;
+        notSupervisedModel = new NotSupervisedModel();
+        DataSource source;
+        Instances data;
+        int acertos = 0;
+        Instances esperandoTempo;
+        int nExeTemp = 0;
+        try {
+            source = new DataSource(caminho + dataset + "-instances.arff");
+            data = source.getDataSet();
+            data.setClassIndex(data.numAttributes() - 1);
+            ArrayList<Attribute> atts = new ArrayList<>();
+            for(int i=0; i<data.numAttributes(); i++) {
+                atts.add(data.attribute(i));
+            }
+            esperandoTempo = data;
+            List<Example> labeledMem = new ArrayList<>();
+            List<Example> unkMem = new ArrayList<>();
+
+            int desconhecido = 0;
+            for(int i=0, j=0, h=0; i<data.size(); i++, j++, h++) {
+                Instance ins = data.get(i);
+                Example exemplo = new Example(ins.toDoubleArray(), true, i);
+                double rotulo = this.supervisedModel.classifyNew(ins, i);
+                exemplo.setRotuloClassificado(rotulo);
+                if(rotulo == exemplo.getRotuloVerdadeiro()) {
+                    acertos++;
+                } else if (rotulo == -1) {
+                    rotulo = notSupervisedModel.classify(exemplo, this.supervisedModel.K, i);
+                    exemplo.setRotuloClassificado(rotulo);
+                    if(rotulo == -1) {
+                        desconhecido++;
+                        unkMem.add(exemplo);
+                        if (unkMem.size() >= T) {
+                            unkMem = this.multiClassNoveltyDetection(unkMem, kShort, phi, minWeight, i);
+                        }
+                    } else {
+                        if(rotulo < 100 && rotulo != exemplo.getRotuloVerdadeiro()) {
+                            erroNs++;
+                        }
+                    }
+                } else {
+//                    System.err.println("Verdadeiro: " + exemplo.getRotuloVerdadeiro());
+//                    System.err.println("Classificado: " + exemplo.getRotuloClassificado());
+                    erroSeparado++;
+                    SPFMiC spfMiC = this.supervisedModel.classifyComErro(ins, i);
+                    if(analiseErros.containsKey(String.valueOf(spfMiC.getN()+spfMiC.getCreated()))) {
+                        analiseErros.get(String.valueOf(spfMiC.getN()+spfMiC.getCreated())).updateNumErros();
+                    } else {
+                        analiseErros.put(String.valueOf(spfMiC.getN()+spfMiC.getCreated()), new AnaliseErros(spfMiC.getN(), spfMiC.getCreated()));
+                    }
+                }
+                results.add(exemplo);
+                this.exemplosEsperandoTempo.add(exemplo);
+                if(j >= latencia) {
+                    Example labeledExample = new Example(esperandoTempo.get(nExeTemp).toDoubleArray(), true, i);
+                    labeledMem.add(labeledExample);
+                    if(labeledMem.size() >= tChunk) {
+                        if(notSupervisedModel.spfMiCS.size() > 0) {
+                            this.results = this.verifyIfExistNewClassInNSModel(labeledMem, this.results, i);
+                        }
+                        labeledMem = this.supervisedModel.trainNewClassifier(labeledMem, i, minWeight);
+                        labeledMem.clear();
+                    }
+                    nExeTemp++;
+                }
+
+                this.supervisedModel.removeOldSPFMiCs(latencia + ts, i);
+                this.removeOldUnknown(unkMem, ts, i);
+
+                if(h == 1000) {
+                    h=0;
+                    if(existNovelty) {
+                        novelties.add(1.0);
+                        existNovelty = false;
+                    } else {
+                        novelties.add(0.0);
+                    }
+                }
+            }
+            HandlesFiles.salvaPredicoes(acuracias, dataset);
+            HandlesFiles.salvaNovidades(novelties, dataset);
+            HandlesFiles.salvaResultados(results, dataset);
+            HandlesFiles.salvaAnaliseDeErros(analiseErros, dataset);
+
+        } catch (Exception ex) {
+            System.out.println(ex);
+            System.out.println(ex.getStackTrace());
+        }
+    }
+
+    private List<Example> verifyIfExistNewClassInNSModel(List<Example> labeledMem, List<Example> results, int t) {
+        List<Double> frs = new ArrayList<>();
+        Map<Double, List<Example>> examplesByClass = FuzzyFunctions.separateByClasses(labeledMem);
+        List<Double> classes = new ArrayList<>();
+        Map<Double, List<SPFMiC>> classifier = new HashMap<>();
+        classes.addAll(examplesByClass.keySet());
+        List<SPFMiC> spfmics = new ArrayList<>();
+        for(int j=0; j<examplesByClass.size(); j++) {
+            if(examplesByClass.get(classes.get(j)).size() > this.supervisedModel.K) {
+                FuzzyKMeansClusterer clusters = FuzzyFunctions.fuzzyCMeans(examplesByClass.get(classes.get(j)), this.supervisedModel.K, this.supervisedModel.fuzzification);
+                List<SPFMiC> spfMiCSAux = FuzzyFunctions.separateExamplesByClusterClassifiedByFuzzyCMeans(examplesByClass.get(classes.get(j)), clusters, classes.get(j), this.supervisedModel.alpha, this.supervisedModel.theta, this.supervisedModel.minWeight, t);
+                if(spfmics != null) {
+                    spfmics.addAll(spfMiCSAux);
+                }
+                classifier.put(classes.get(j), spfmics);
+            }
+        }
+
+        for(int i=0; i<spfmics.size(); i++) {
+            if(notSupervisedModel.spfMiCS.size() > 0) {
+                if (!spfmics.get(i).isNull()) {
+                    frs.clear();
+                    double dist2 = Double.MAX_VALUE;
+                    for (int j = 0; j < notSupervisedModel.spfMiCS.size(); j++) {
+                        double dist3 = DistanceMeasures.calculaDistanciaEuclidiana(spfmics.get(i).getCentroide(), notSupervisedModel.spfMiCS.get(j).getCentroide());
+                        if (dist3 < dist2) {
+                            dist2 = dist3;
+                        }
+
+                        double di = notSupervisedModel.spfMiCS.get(j).getRadius();
+                        double dj = spfmics.get(i).getRadius();
+                        double dist = (di + dj) / DistanceMeasures.calculaDistanciaEuclidiana(notSupervisedModel.spfMiCS.get(j).getCentroide(), spfmics.get(i).getCentroide());
+                        frs.add((di + dj) / dist);
+                    }
+
+                    Double minFr = Collections.min(frs);
+                    int indexMinFr = frs.indexOf(minFr);
+                    if (minFr <= this.phi) {
+                        if(spfmics.get(i).getRotulo() != notSupervisedModel.spfMiCS.get(indexMinFr).getRotuloReal()) {
+                            System.err.println("Rotulos não batem");
+                        }
+                        for(int h=0; h<results.size(); h++) {
+                            if(results.get(h).getRotuloClassificado() > 100) {
+                                if (results.get(h).getRotuloClassificado() == notSupervisedModel.spfMiCS.get(indexMinFr).getRotulo()) {
+                                    results.get(h).setRotuloClassificado(spfmics.get(i).getRotulo());
+                                }
+                            }
+                        }
+
+                        List<SPFMiC> aux = new ArrayList<>();
+                        for(int j = 0; j< notSupervisedModel.spfMiCS.size(); j++) {
+                            if(!(notSupervisedModel.spfMiCS.get(indexMinFr).getRotulo() == notSupervisedModel.spfMiCS.get(j).getRotulo()
+                                    && frs.get(j) < this.phi)) {
+                                aux.add(notSupervisedModel.spfMiCS.get(j));
+                            }
+                        }
+                        notSupervisedModel.spfMiCS = aux;
+                    }
+                }
+            }
+        }
+        return results;
+    }
+
+    private List<Example> multiClassNoveltyDetection(List<Example> listaDesconhecidos, int kCurto, double phi, int minWeight, int t) {
+        if(listaDesconhecidos.size() > kCurto) {
+            FuzzyKMeansClusterer clusters = FuzzyFunctions.fuzzyCMeans(listaDesconhecidos, kCurto, this.supervisedModel.fuzzification);
+            List<CentroidCluster> centroides = clusters.getClusters();
+            List<Double> silhuetas = FuzzyFunctions.fuzzySilhouette(clusters, listaDesconhecidos, this.supervisedModel.alpha);
+            List<Integer> silhuetasValidas = new ArrayList<>();
+
+            for (int i = 0; i < silhuetas.size(); i++) {
+                if (silhuetas.get(i) > 0 && centroides.get(i).getPoints().size() >= minWeight) {
+                    silhuetasValidas.add(i);
+                }
+            }
+
+            List<SPFMiC> sfMiCS = FuzzyFunctions.newSeparateExamplesByClusterClassifiedByFuzzyCMeans(listaDesconhecidos, clusters, -1, this.supervisedModel.alpha, this.supervisedModel.theta, minWeight, t);
+            List<SPFMiC> sfmicsConhecidos = supervisedModel.getAllSPFMiCs();
+            List<Double> frs = new ArrayList<>();
+
+            for (int i = 0; i < centroides.size(); i++) {
+                if (silhuetasValidas.contains(i) && !sfMiCS.get(i).isNull()) {
+                    frs.clear();
+                    for (int j = 0; j < sfmicsConhecidos.size(); j++) {
+                        double di = sfmicsConhecidos.get(j).getRadius();
+                        double dj = sfMiCS.get(i).getRadius();
+                        double dist = (di + dj) / DistanceMeasures.calculaDistanciaEuclidiana(sfmicsConhecidos.get(j).getCentroide(), sfMiCS.get(i).getCentroide());
+                        frs.add((di + dj) / dist);
+                    }
+
+                    if(frs.size() > 0) {
+                        Double minFr = Collections.min(frs);
+                        int indexMinFr = frs.indexOf(minFr);
+                        if (minFr <= phi) {
+                            sfMiCS.get(i).setRotulo(sfmicsConhecidos.get(indexMinFr).getRotulo());
+                            List<Example> examples = centroides.get(i).getPoints();
+                            HashMap<Double, Integer> rotulos = new HashMap<>();
+                            for (int j = 0; j < examples.size(); j++) {
+                                listaDesconhecidos.remove(examples.get(j));
+                                if (rotulos.containsKey(examples.get(j).getRotuloVerdadeiro())) {
+                                    rotulos.put(examples.get(j).getRotuloVerdadeiro(), rotulos.get(examples.get(j).getRotuloVerdadeiro()) + 1);
+                                } else {
+                                    rotulos.put(examples.get(j).getRotuloVerdadeiro(), 1);
+                                }
+                            }
+
+                            Double[] keys = rotulos.keySet().toArray(new Double[0]);
+                            double maiorValor = Double.MIN_VALUE;
+                            double maiorRotulo = -1;
+                            for (int k = 0; k < rotulos.size(); k++) {
+                                if (maiorValor < rotulos.get(keys[k])) {
+                                    maiorValor = rotulos.get(keys[k]);
+                                    maiorRotulo = keys[k];
+                                }
+                            }
+                            if (maiorRotulo != sfMiCS.get(i).getRotulo()) {
+                                System.err.println("Rotulo Diferente ");
+                            }
+                            sfMiCS.get(i).setRotuloReal(maiorRotulo);
+                            notSupervisedModel.spfMiCS.add(sfMiCS.get(i));
+                        } else {
+                            existNovelty = true;
+                            sfMiCS.get(i).setRotulo(this.generateNPLabel());
+                            List<Example> examples = centroides.get(i).getPoints();
+                            HashMap<Double, Integer> rotulos = new HashMap<>();
+                            for (int j = 0; j < examples.size(); j++) {
+                                listaDesconhecidos.remove(examples.get(j));
+                                if (rotulos.containsKey(examples.get(j).getRotuloVerdadeiro())) {
+                                    rotulos.put(examples.get(j).getRotuloVerdadeiro(), rotulos.get(examples.get(j).getRotuloVerdadeiro()) + 1);
+                                } else {
+                                    rotulos.put(examples.get(j).getRotuloVerdadeiro(), 1);
+                                }
+                            }
+
+                            Double[] keys = rotulos.keySet().toArray(new Double[0]);
+                            double maiorValor = Double.MIN_VALUE;
+                            double maiorRotulo = -1;
+                            for (int k = 0; k < rotulos.size(); k++) {
+                                if (maiorValor < rotulos.get(keys[k])) {
+                                    maiorValor = rotulos.get(keys[k]);
+                                    maiorRotulo = keys[k];
+                                }
+                            }
+
+                            sfMiCS.get(i).setRotuloReal(maiorRotulo);
+                            notSupervisedModel.spfMiCS.add(sfMiCS.get(i));
+                        }
+                    }
+                }
+            }
+        }
+        return listaDesconhecidos;
+    }
+
+    private double generateNPLabel() {
+        nPCount++;
+        return nPCount;
+    }
+
+    private List<Example> removeOldUnknown(List<Example> unkMem, int ts, int ct) {
+        List<Example> newUnkMem = new ArrayList<>();
+        for(int i=0; i<unkMem.size(); i++) {
+            if(ct - unkMem.get(i).getTime() <= ts) {
+                newUnkMem.add(unkMem.get(i));
+            }
+        }
+        return newUnkMem;
+    }
+}
