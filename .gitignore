@@ -9,4 +9,4 @@ target/
 *.ipr
 *.idea
 
-/dataset
+datasets/
