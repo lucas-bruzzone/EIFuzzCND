@@ -116,7 +116,7 @@ public class SupervisedModel {
     }
 
 
-    public List<Example> trainNewClassifier(List<Example> chunk, int t, int minWeight) throws Exception {
+    public List<Example> trainNewClassifier(List<Example> chunk, int t) throws Exception {
         List<Example> newChunk = new ArrayList<>();
         Map<Double, List<Example>> examplesByClass = FuzzyFunctions.separateByClasses(chunk);
         List<Double> classes = new ArrayList<>();

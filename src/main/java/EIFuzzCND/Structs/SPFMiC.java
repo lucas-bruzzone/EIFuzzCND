@@ -25,22 +25,6 @@ public class SPFMiC implements Instance {
     private double theta;
     private boolean isNull;
 
-    //Initial State
-
-    private double[] initialCentroide;
-    private double[] initialCF1pertinencias;
-    private double[] initialCF1tipicidades;
-    private double initialMe;
-    private double initialTe;
-    private double initialSSDe;
-    private double initialN;
-    private double initialRotulo;
-    private double initialRotuloReal;
-    private double initialAlpha;
-    private double initialTheta;
-
-
-
 
     public SPFMiC(double[] centroide, int N, double alpha, double theta, int t) {
         this.CF1pertinencias = new double[centroide.length];
@@ -455,91 +439,4 @@ public class SPFMiC implements Instance {
         Te = te;
     }
 
-    public double[] getInitialCentroide() {
-        return initialCentroide;
-    }
-
-    public void setInitialCentroide(double[] initialCentroide) {
-        this.initialCentroide = initialCentroide;
-    }
-
-    public double[] getInitialCF1pertinencias() {
-        return initialCF1pertinencias;
-    }
-
-    public void setInitialCF1pertinencias(double[] initialCF1pertinencias) {
-        this.initialCF1pertinencias = initialCF1pertinencias;
-    }
-
-    public double[] getInitialCF1tipicidades() {
-        return initialCF1tipicidades;
-    }
-
-    public void setInitialCF1tipicidades(double[] initialCF1tipicidades) {
-        this.initialCF1tipicidades = initialCF1tipicidades;
-    }
-
-    public double getInitialMe() {
-        return initialMe;
-    }
-
-    public void setInitialMe(double initialMe) {
-        this.initialMe = initialMe;
-    }
-
-    public double getInitialTe() {
-        return initialTe;
-    }
-
-    public void setInitialTe(double initialTe) {
-        this.initialTe = initialTe;
-    }
-
-    public double getInitialSSDe() {
-        return initialSSDe;
-    }
-
-    public void setInitialSSDe(double initialSSDe) {
-        this.initialSSDe = initialSSDe;
-    }
-
-    public double getInitialN() {
-        return initialN;
-    }
-
-    public void setInitialN(double initialN) {
-        this.initialN = initialN;
-    }
-
-    public double getInitialRotulo() {
-        return initialRotulo;
-    }
-
-    public void setInitialRotulo(double initialRotulo) {
-        this.initialRotulo = initialRotulo;
-    }
-
-    public double getInitialRotuloReal() {
-        return initialRotuloReal;
-    }
-
-    public void setInitialRotuloReal(double initialRotuloReal) {
-        this.initialRotuloReal = initialRotuloReal;
-    }
-
-    public double getInitialAlpha() {
-        return initialAlpha;
-    }
-
-    public void setInitialAlpha(double initialAlpha) {
-        this.initialAlpha = initialAlpha;
-    }
-
-    public double getInitialTheta() {
-        return initialTheta;
-    }
-
-    public void setInitialTheta(double initialTheta) {
-        this.initialTheta = initialTheta;
-    }
 }

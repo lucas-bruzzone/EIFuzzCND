@@ -4,8 +4,11 @@ import EIFuzzCND.FuzzyFunctions.*;
 import EIFuzzCND.Models.*;
 import EIFuzzCND.Output.HandlesFiles;
 import EIFuzzCND.Structs.*;
+import EIFuzzCND.Evaluation.ConfusionMatrix;
+import org.apache.commons.math3.analysis.function.Max;
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.FuzzyKMeansClusterer;
+import weka.classifiers.Evaluation;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -53,6 +56,8 @@ public class OnlinePhase {
         Instances esperandoTempo;
         int nExeTemp = 0;
 
+        //ConfusionMatrix
+        ConfusionMatrix confusionMatrix = new ConfusionMatrix(50);
 
 
         try {
@@ -69,6 +74,8 @@ public class OnlinePhase {
             //intermediaria
             esperandoTempo = data;
             List<Example> labeledMem = new ArrayList<>();
+
+
 
             for(int tempo = 0, novidade = 0, tempoLatencia = 0; tempo <data.size(); tempo++,novidade++, tempoLatencia++) {
                 Instance ins = data.get(tempo);
@@ -87,6 +94,10 @@ public class OnlinePhase {
                 }
 
                 results.add(exemplo);
+
+
+                confusionMatrix.addInstance(exemplo.getRotuloVerdadeiro(),exemplo.getRotuloClassificado());
+
                 this.exemplosEsperandoTempo.add(exemplo);
 
 
@@ -94,7 +105,7 @@ public class OnlinePhase {
                     Example labeledExample = new Example(esperandoTempo.get(nExeTemp).toDoubleArray(), true, tempo);
                     labeledMem.add(labeledExample);
                     if(labeledMem.size() >= tChunk) {
-                        labeledMem = this.supervisedModel.trainNewClassifier(labeledMem, tempo,minWeight);
+                        labeledMem = this.supervisedModel.trainNewClassifier(labeledMem, tempo);
                         labeledMem.clear();
                     }
                     nExeTemp++;
@@ -112,10 +123,16 @@ public class OnlinePhase {
                         novelties.add(0.0);
                     }
                 }
+
             }
 
+
+            confusionMatrix.printMatrix();
+            confusionMatrix.saveToFile(caminho + dataset + "ConfusionMatrix" + latencia + ".csv");
             HandlesFiles.salvaNovidades(novelties, dataset,latencia);
             HandlesFiles.salvaResultados(results, dataset,latencia);
+
+
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -230,6 +247,7 @@ public class OnlinePhase {
         }
         return newUnkMem;
     }
+
 
 
 }

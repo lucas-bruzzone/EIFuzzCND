@@ -25,7 +25,7 @@ public class FuzzySystem {
         int minWeightOffline = 0;
         int minWeightOnline = 15;
         int latencia = 10000000;// 2000, 5000, 10000,10000000
-        int  tChunk = 2000;
+        int tChunk = 2000;
         int ts = 200;
 
         double phi = 0.4;

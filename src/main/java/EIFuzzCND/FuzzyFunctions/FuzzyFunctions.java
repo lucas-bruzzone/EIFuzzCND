@@ -156,15 +156,10 @@ public class FuzzyFunctions {
     public static List<SPFMiC> newSeparateExamplesByClusterClassifiedByFuzzyCMeans(List<Example> exemplos, FuzzyKMeansClusterer fuzzyClusterer, double rotulo, double alpha, double theta, int minWeight, int t) {
         List<SPFMiC> sfMiCS = new ArrayList<SPFMiC>();
         double[][] matrizMembership = fuzzyClusterer.getMembershipMatrix().getData();
-        //matriz de Tipicidade
-        // double[][] matrizTipicidade = FuzzyFunctions.calculaTipicidade(matrizMembership);
         List<CentroidCluster> centroides = fuzzyClusterer.getClusters();
         for(int j=0; j<centroides.size(); j++) {
             SPFMiC sfMiC = null;
             double SSD = 0;
-            //double  SSDe = 0, Me= 0, Te = 0 ;
-            //double[] CF1pertinencias = new double[exemplos.get(0).getPonto().length] ;
-            //double[] CF1tipicidades = new double[exemplos.get(0).getPonto().length] ;
             List<Example> examples = centroides.get(j).getPoints();
             for(int k=0; k<examples.size(); k++) {
                 int indexExample = exemplos.indexOf(examples.get(k));
@@ -175,44 +170,19 @@ public class FuzzyFunctions {
                             theta, t);
                     sfMiC.setRotulo(rotulo);
                     double valorPertinencia = matrizMembership[indexExample][j];
-                    //double valorTipicidade = matrizTipicidade[indexExample][j];
                     double[] ex = exemplos.get(k).getPonto();
                     double distancia = DistanceMeasures.calculaDistanciaEuclidiana(sfMiC.getCentroide(), ex);
-                    // Mudança Me -- Validar
-                    //Me += Math.pow(valorPertinencia,alpha);
-                    // Mudança Te -- Validar
-                    //Te += Math.pow(valorTipicidade,theta);
-                    //SSDe += valorPertinencia * Math.pow(distancia, 2);
                     SSD += valorPertinencia * Math.pow(distancia, 2);
                 } else {
                     double valorPertinencia = matrizMembership[k][j];
-                    //double valorTipicidade = matrizTipicidade[k][j];
                     double[] ex = exemplos.get(k).getPonto();
                     double distancia = DistanceMeasures.calculaDistanciaEuclidiana(sfMiC.getCentroide(), ex);
-                    //for (int i = 0; i < ex.length; i++) {
-                    //    CF1pertinencias[i] += ex[i] * valorPertinencia;
-                    //    CF1tipicidades[i] += ex[i] * valorTipicidade;
-                    //}
-                    // Mudança Me -- Validar
-                    //Me += Math.pow(valorPertinencia,alpha);
-                    // Mudança Te -- Validar
-                    //Te += Math.pow(valorTipicidade,theta);
-                    //SSDe += valorPertinencia * Math.pow(distancia, 2);
                     SSD += valorPertinencia * Math.pow(distancia, 2);
                 }
             }
             if(sfMiC != null) {
-                // for (int i = 0; i < sfMiC.getCF1pertinencias().length; i++) {
-                //     CF1pertinencias[i] += sfMiC.getCF1pertinencias()[i] ;
-                //     CF1tipicidades[i] += sfMiC.getCF1tipicidades()[i] ;
-                // }
                 if(sfMiC.getN() >= minWeight) {
                     sfMiC.setSSDe(SSD);
-                    //    sfMiC.setSSDe(SSDe);
-                    //    sfMiC.setMe(Me);
-                    //    sfMiC.setTe(Te);
-                    //    sfMiC.setCF1pertinencias(CF1pertinencias);
-                    //    sfMiC.setCF1tipicidades(CF1tipicidades);
                 }
             }
             sfMiCS.add(sfMiC);

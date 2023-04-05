@@ -38,15 +38,4 @@ public class NotSupervisedModel {
         return this.spfMiCS.get(index).getRotulo();
     }
 
-    public void removeOldSPFMiCs(int ts, int currentTime) {
-        List<SPFMiC> spfMiCSAux = this.spfMiCS;
-        int k = 0;
-        for(int i=0; i<spfMiCS.size(); i++) {
-            if(currentTime - spfMiCS.get(i).getT() > ts && currentTime - spfMiCS.get(i).getUpdated() > ts) {
-                spfMiCSAux.remove(spfMiCS.get(i));
-                k++;
-            }
-        }
-        this.spfMiCS = spfMiCSAux;
-    }
 }
