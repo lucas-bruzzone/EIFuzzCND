@@ -16,7 +16,7 @@ public class Results {
     public static void main(String[] args) throws IOException, ParseException {
         String current = (new File(".")).getCanonicalPath();
         String dataset = "moa";
-        String[] latencia = {"10000000"};//"2000","5000","10000",,"10000000","10000"
+        String[] latencia = {"10000000"};//"2000","5000","10000","10000000","10000"
 
         Map<Integer, List<ResultsForExample>> resultsEIFuzzCND = new HashMap<>();
         ArrayList<Double> novidades = new ArrayList<>();

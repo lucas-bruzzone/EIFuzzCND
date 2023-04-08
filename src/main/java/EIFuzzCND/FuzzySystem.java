@@ -28,6 +28,7 @@ public class FuzzySystem {
         int tChunk = 2000;
         int ts = 200;
 
+
         double phi = 0.4;
 
         ConverterUtils.DataSource source;

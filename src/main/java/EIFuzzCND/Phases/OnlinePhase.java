@@ -4,11 +4,9 @@ import EIFuzzCND.FuzzyFunctions.*;
 import EIFuzzCND.Models.*;
 import EIFuzzCND.Output.HandlesFiles;
 import EIFuzzCND.Structs.*;
-import EIFuzzCND.Evaluation.ConfusionMatrix;
-import org.apache.commons.math3.analysis.function.Max;
+import EIFuzzCND.ConfusionMatrix.ConfusionMatrix;
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.FuzzyKMeansClusterer;
-import weka.classifiers.Evaluation;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -57,8 +55,7 @@ public class OnlinePhase {
         int nExeTemp = 0;
 
         //ConfusionMatrix
-        ConfusionMatrix confusionMatrix = new ConfusionMatrix(50);
-
+        ConfusionMatrix confusionMatrix = new ConfusionMatrix();
 
         try {
             source = new DataSource(caminho + dataset + "-instances.arff");
@@ -88,7 +85,7 @@ public class OnlinePhase {
                     if(rotulo == -1) {
                         unkMem.add(exemplo);
                         if (unkMem.size() >= T) {
-                            unkMem = this.multiClassNoveltyDetection(unkMem, tempo);
+                            unkMem = this.multiClassNoveltyDetection(unkMem, tempo,confusionMatrix);
                         }
                     }
                 }
@@ -97,6 +94,7 @@ public class OnlinePhase {
 
 
                 confusionMatrix.addInstance(exemplo.getRotuloVerdadeiro(),exemplo.getRotuloClassificado());
+
 
                 this.exemplosEsperandoTempo.add(exemplo);
 
@@ -114,9 +112,12 @@ public class OnlinePhase {
                 supervisedModel.removeOldSPFMiCs(latencia + ts, tempo);
                 this.removeOldUnknown(unkMem, ts, tempo);
 
-                if(novidade == 1000) {
-                    novidade=0;
-                    if(existNovelty) {
+
+                if (novidade == 1000) {
+                    novidade = 0;
+                    confusionMatrix.mergeClasses(confusionMatrix.getClassesWithMaxCount());
+                    System.out.println(confusionMatrix.calculateAccuracy());
+                    if (existNovelty) {
                         novelties.add(1.0);
                         existNovelty = false;
                     } else {
@@ -125,10 +126,12 @@ public class OnlinePhase {
                 }
 
             }
+            confusionMatrix.printMatrix();
 
+            confusionMatrix.mergeClasses(confusionMatrix.getClassesWithMaxCount());
 
             confusionMatrix.printMatrix();
-            confusionMatrix.saveToFile(caminho + dataset + "ConfusionMatrix" + latencia + ".csv");
+            System.out.println("Desconhecidos:" + unkMem.size());
             HandlesFiles.salvaNovidades(novelties, dataset,latencia);
             HandlesFiles.salvaResultados(results, dataset,latencia);
 
@@ -141,8 +144,8 @@ public class OnlinePhase {
     }
 
 
-    private List<Example> multiClassNoveltyDetection(List<Example> listaDesconhecidos, int tempo) {
-        if(listaDesconhecidos.size() > kShort) {
+    private List<Example> multiClassNoveltyDetection(List<Example> listaDesconhecidos, int tempo, ConfusionMatrix confusionMatrix) {
+        if (listaDesconhecidos.size() > kShort) {
             FuzzyKMeansClusterer clusters = FuzzyFunctions.fuzzyCMeans(listaDesconhecidos, kShort, this.supervisedModel.fuzzification);
             List<CentroidCluster> centroides = clusters.getClusters();
             List<Double> silhuetas = FuzzyFunctions.fuzzySilhouette(clusters, listaDesconhecidos, this.supervisedModel.alpha);
@@ -168,7 +171,7 @@ public class OnlinePhase {
                         frs.add((di + dj) / dist);
                     }
 
-                    if(frs.size() > 0) {
+                    if (frs.size() > 0) {
                         Double minFr = Collections.min(frs);
                         int indexMinFr = frs.indexOf(minFr);
                         if (minFr <= phi) {
@@ -197,6 +200,14 @@ public class OnlinePhase {
                             if (maiorRotulo == sfMiCS.get(i).getRotulo()) {
                                 sfMiCS.get(i).setRotuloReal(maiorRotulo);
                                 notSupervisedModel.spfMiCS.add(sfMiCS.get(i));
+
+                                for (int j = 0; j < examples.size(); j++) {
+                                    double trueLabel = examples.get(j).getRotuloVerdadeiro();
+                                    double predictedLabel = sfMiCS.get(i).getRotulo(); // usar o rótulo do SFMiCS
+                                    System.out.println("True Label:" + trueLabel + "predicted Label:" + predictedLabel);
+                                    confusionMatrix.addInstance(trueLabel, predictedLabel);
+                                    confusionMatrix.updateConfusionMatrix(trueLabel,predictedLabel);
+                                }
                             }
 
                         } else {
@@ -206,6 +217,10 @@ public class OnlinePhase {
                             HashMap<Double, Integer> rotulos = new HashMap<>();
                             for (int j = 0; j < examples.size(); j++) {
                                 listaDesconhecidos.remove(examples.get(j));
+                                double trueLabel = examples.get(j).getRotuloVerdadeiro();
+                                double predictedLabel = sfMiCS.get(i).getRotulo();
+                                confusionMatrix.addInstance(trueLabel, predictedLabel);
+                                confusionMatrix.updateConfusionMatrix(trueLabel, predictedLabel);
                                 if (rotulos.containsKey(examples.get(j).getRotuloVerdadeiro())) {
                                     rotulos.put(examples.get(j).getRotuloVerdadeiro(), rotulos.get(examples.get(j).getRotuloVerdadeiro()) + 1);
                                 } else {
@@ -247,7 +262,6 @@ public class OnlinePhase {
         }
         return newUnkMem;
     }
-
 
 
 }
