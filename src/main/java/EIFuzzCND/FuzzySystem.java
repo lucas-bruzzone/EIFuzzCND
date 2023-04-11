@@ -28,6 +28,7 @@ public class FuzzySystem {
         int tChunk = 2000;
         int ts = 200;
 
+        double percentLabeled = 1.0;
 
         double phi = 0.4;
 
@@ -44,7 +45,7 @@ public class FuzzySystem {
 
         OfflinePhase offlinePhase = new OfflinePhase(dataset, caminho, fuzzyfication, alpha, theta, K, minWeightOffline);
         SupervisedModel supervisedModel = offlinePhase.inicializar(data);
-        OnlinePhase onlinePhase = new OnlinePhase(caminho, supervisedModel, latencia, tChunk, T, kshort, phi, ts, minWeightOnline);
+        OnlinePhase onlinePhase = new OnlinePhase(caminho, supervisedModel, latencia, tChunk, T, kshort, phi, ts, minWeightOnline,percentLabeled);
         onlinePhase.initialize(dataset);
 
 

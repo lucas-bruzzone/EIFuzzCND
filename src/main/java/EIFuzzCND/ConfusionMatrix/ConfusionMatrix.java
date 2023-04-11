@@ -132,12 +132,11 @@ public class ConfusionMatrix {
     }
 
 
-    public void updateConfusionMatrix(double trueLabel, double predictedLabel) {
+    public void updateConfusionMatrix(double trueLabel) {
         // Remove -1 no cruzamento entre trueLabel e -1
         Integer count = matrix.get(trueLabel).get(-1.0);
         matrix.get(trueLabel).put(-1.0, count - 1);
     }
-
 
 
 
@@ -164,6 +163,19 @@ public class ConfusionMatrix {
 
         return (double) correctPredictions / totalSamples;
     }
+
+    public int countUnknow() {
+        int count = 0;
+        for (Map.Entry<Double, Map<Double, Integer>> row : matrix.entrySet()) {
+            Map<Double, Integer> colMap = row.getValue();
+            if (colMap.containsKey(-1.0)) {
+                count += colMap.get(-1.0);
+            }
+        }
+        return count;
+    }
+
+
 
 
 }

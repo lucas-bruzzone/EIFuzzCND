@@ -12,24 +12,28 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
+import static EIFuzzCND.Output.HandlesFiles.loadAcuracia;
+
 public class Results {
     public static void main(String[] args) throws IOException, ParseException {
         String current = (new File(".")).getCanonicalPath();
         String dataset = "moa";
         String[] latencia = {"10000000"};//"2000","5000","10000","10000000","10000"
-
+        String percentedLabeled = "1.0";
         Map<Integer, List<ResultsForExample>> resultsEIFuzzCND = new HashMap<>();
-        ArrayList<Double> novidades = new ArrayList<>();
-
+        ArrayList<Double> novidades;
         for(int i =0 ; i<latencia.length;i++) {
 
             String caminhoTrain = current + "/datasets/" + dataset + "/" + dataset + "-train.csv";
-            String caminhoResultados = current + "/datasets/" + dataset + "/" + dataset + latencia[i] + "-EIFuzzCND-results.csv";
-            String caminhoNovidades = current + "/datasets/" + dataset + "/" + dataset + latencia[i] + "-EIFuzzCND-novelties.csv";
+            String caminhoResultados = current + "/datasets/" + dataset + "/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-results.csv";
+            String caminhoNovidades = current + "/datasets/" + dataset + "/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-novelties.csv";
+            String caminhoAcuracia = current + "/datasets/" + dataset + "/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-acuracia.csv";
+
 
             ArrayList<Double> classesTreinamento = checkLastColumn(caminhoTrain);
             Integer countResults = countLinesInCsv(caminhoResultados);
             Integer countNovelties = countLinesInCsv(caminhoNovidades);
+            Integer countAcuracias = countLinesInCsv(caminhoAcuracia);
             ArrayList<Integer> novasClasses = storeLines(caminhoResultados, classesTreinamento);
             for (int j = 0; j < 1; j++) {
                 resultsEIFuzzCND.put(j, HandlesFiles.loadResults(caminhoResultados, countResults));
@@ -37,109 +41,20 @@ public class Results {
 
             novidades = HandlesFiles.loadNovelties(caminhoNovidades, countNovelties);
 
-            int unknown = 0;
-            int acertos = 0;
-            int acertosCount = 0;
-            int count = 0;
-            int errors = 0;
-            int novelty = 0;
+            ArrayList<Double> acuraciasFuzzCND = new ArrayList<>();
+            ArrayList<Double> unkRFuzzCND = new ArrayList<>();
 
-
-            ArrayList<Double> acuraciasECSMiner = new ArrayList<>();
-            Map<String, Integer> unkRiFuzzCND = new HashMap<>();
-            Map<String, Integer> excFuzzCND = new HashMap<>();
-            ArrayList<Double> unkRECSMiner = new ArrayList<>();
-
-            Map<Integer, ArrayList<Double>> medidasAcuracias = new HashMap<>();
-            Map<Integer, ArrayList<Double>> medidasUnkR = new HashMap<>();
+            HandlesFiles.loadAcuracia(caminhoAcuracia, countAcuracias, acuraciasFuzzCND, unkRFuzzCND);
 
             ArrayList<List<Double>> metricasFuzzCND = new ArrayList<>();
-            ArrayList<List<Double>> metricasECSMiner = new ArrayList<>();
-            ArrayList<Double> noveltiesFuzzCND = new ArrayList<>();
-
-            for (int l = 0; l < resultsEIFuzzCND.size(); l++) {
-                List<ResultsForExample> results = resultsEIFuzzCND.get(l);
-                ArrayList<Double> acuraciasFuzzCND = new ArrayList<>();
-                ArrayList<Double> unkRFuzzCND = new ArrayList<>();
-                boolean existNovelty = false;
-                List<Double> novelties = new ArrayList<>();
-                for (int k = 0, j = 1; k < results.size(); j++, k++) {
-                    if (excFuzzCND.containsKey(results.get(k).getRealClass())) {
-                        excFuzzCND.replace(results.get(k).getRealClass(), excFuzzCND.get(results.get(k).getRealClass()) + 1);
-                    } else {
-                        excFuzzCND.put(results.get(k).getRealClass(), 1);
-                    }
-
-                    if (results.get(k).getClassifiedClass().equals("unknown")) {
-                        unknown++;
-                        if (unkRiFuzzCND.containsKey(results.get(k).getRealClass())) {
-                            unkRiFuzzCND.replace(results.get(k).getRealClass(), unkRiFuzzCND.get(results.get(k).getRealClass()) + 1);
-                        } else {
-                            unkRiFuzzCND.put(results.get(k).getRealClass(), 1);
-                        }
-                    } else {
-                        if (Double.parseDouble(results.get(k).getClassifiedClass()) > 100) {
-                            if (!novelties.contains(Double.parseDouble(results.get(k).getClassifiedClass()))) {
-                                existNovelty = true;
-                                novelties.add(Double.parseDouble(results.get(k).getClassifiedClass()));
-                            }
-                            novelty++;
-                        } else {
-                            count++;
-                            if (results.get(k).getClassifiedClass().equals(results.get(k).getRealClass())) {
-                                acertos++;
-                                acertosCount++;
-                            } else {
-                                errors++;
-                            }
-                        }
-                    }
-                    if (j == 1000) {
-                        acuraciasFuzzCND.add(((double) acertosCount / count) * 100);
-                        unkRFuzzCND.add(calculaUnkR(unkRiFuzzCND, excFuzzCND));
-                        if (l == 0) {
-                            if (existNovelty) {
-                                noveltiesFuzzCND.add(Double.parseDouble(String.valueOf(1.0)));
-                            } else {
-                                noveltiesFuzzCND.add(Double.parseDouble(String.valueOf(0.0)));
-                            }
-                        }
-                        j = 0;
-                    }
-                }
-                acertosCount = 0;
-                unkRiFuzzCND.clear();
-                excFuzzCND.clear();
-                count = 0;
-                medidasAcuracias.put(l, acuraciasFuzzCND);
-                medidasUnkR.put(l, unkRFuzzCND);
-            }
-
-            ArrayList<Double> acuraciasFinal = new ArrayList<>();
-            ArrayList<Double> unkRFinal = new ArrayList<>();
-
-            for (int k = 0; k < medidasAcuracias.get(0).size(); k++) {
-                double somaAc = 0;
-                double somaUnk = 0;
-                for (int j = 0; j < medidasAcuracias.size(); j++) {
-                    somaAc = somaAc + medidasAcuracias.get(j).get(k);
-                    somaUnk = somaUnk + medidasUnkR.get(j).get(k);
-                }
-                acuraciasFinal.add(somaAc / medidasAcuracias.size());
-                unkRFinal.add(somaUnk / medidasAcuracias.size());
-            }
-
 
             List<String> rotulos = new ArrayList<>();
             rotulos.add("Accuracy");
             rotulos.add("UnkR");
 
-            metricasFuzzCND.add(acuraciasFinal);
-            metricasFuzzCND.add(unkRFinal);
-            metricasFuzzCND.add(noveltiesFuzzCND);
 
-            metricasECSMiner.add(acuraciasECSMiner);
-            metricasECSMiner.add(unkRECSMiner);
+            metricasFuzzCND.add(acuraciasFuzzCND);
+            metricasFuzzCND.add(unkRFuzzCND);
 
             LineChart_AWT chart2 = new LineChart_AWT(
                     latencia[i],
