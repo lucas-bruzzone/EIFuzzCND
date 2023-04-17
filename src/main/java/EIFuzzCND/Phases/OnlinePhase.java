@@ -1,5 +1,6 @@
 package EIFuzzCND.Phases;
 
+import EIFuzzCND.ConfusionMatrix.Metrics;
 import EIFuzzCND.FuzzyFunctions.*;
 import EIFuzzCND.Models.*;
 import EIFuzzCND.Output.HandlesFiles;
@@ -27,11 +28,9 @@ public class OnlinePhase {
     double phi = 0;
     boolean existNovelty = false;
     double nPCount = 100;
-    public List<Example> exemplosEsperandoTempo = new ArrayList<>();
     List<Double> novelties = new ArrayList<>();
-    List<Example> results = new ArrayList<>();
     private double percentLabeled;
-
+    List<Example> results = new ArrayList<>();
 
     public OnlinePhase(String caminho, SupervisedModel supervisedModel, int latencia, int tChunk, int T, int kShort, double phi, int ts, int minWeight,double percentLabeled) {
         this.caminho = caminho;
@@ -59,6 +58,8 @@ public class OnlinePhase {
         //ConfusionMatrix
         ConfusionMatrix confusionMatrix = new ConfusionMatrix();
         boolean append = false;
+        Metrics metrics;
+        List<Metrics> listaMetricas = new ArrayList<>();
 
 
         try {
@@ -78,7 +79,7 @@ public class OnlinePhase {
 
 
 
-            for(int tempo = 0, novidade = 0, tempoLatencia = 0; tempo <data.size(); tempo++,novidade++, tempoLatencia++) {
+            for(int tempo = 0, tempoLatencia = 0; tempo <data.size(); tempo++, tempoLatencia++) {
                 Instance ins = data.get(tempo);
                 Example exemplo = new Example(ins.toDoubleArray(), true, tempo);
                 double rotulo = this.supervisedModel.classifyNew(ins, tempo);
@@ -116,11 +117,10 @@ public class OnlinePhase {
                 this.removeOldUnknown(unkMem, ts, tempo);
 
 
-                if (novidade == 1000) {
-                    novidade = 0;
-                    confusionMatrix.mergeClasses(confusionMatrix.getClassesWithMaxCount());
-                    HandlesFiles.salvaAcuracia(tempo,confusionMatrix.calculateAccuracy(),dataset , latencia , percentLabeled, confusionMatrix.countUnknow(), append);
-                    append = true;
+                if (tempo%1000 == 0) {
+                    confusionMatrix.mergeClasses(confusionMatrix.getClassesWithNonZeroCount());
+                    metrics = confusionMatrix.calculateMetrics(tempo,confusionMatrix.countUnknow());
+                    listaMetricas.add(metrics);
                     if (existNovelty) {
                         novelties.add(1.0);
                         existNovelty = false;
@@ -131,16 +131,20 @@ public class OnlinePhase {
 
             }
 
-            confusionMatrix.mergeClasses(confusionMatrix.getClassesWithMaxCount());
-            confusionMatrix.printMatrix();
+            // Salva todas as métricas no arquivo
+            for (Metrics metrica : listaMetricas) {
+                HandlesFiles.salvaMetrics(metrica.getTempo()/1000, metrica.getAccuracy(), metrica.getPrecision(), metrica.getRecall(), metrica.getF1Score(), dataset, latencia, percentLabeled, metrica.getUnkMem(),metrica.getUnknownRate(), append);
+                append = true;
+            }
 
+
+            confusionMatrix.mergeClasses(confusionMatrix.getClassesWithNonZeroCount());
+            confusionMatrix.printMatrix();
             System.out.println("Desconhecidos:" + unkMem.size());
 
 
             HandlesFiles.salvaNovidades(novelties, dataset,latencia,percentLabeled);
             HandlesFiles.salvaResultados(results, dataset,latencia,percentLabeled);
-
-
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -186,7 +190,6 @@ public class OnlinePhase {
                             for (int j = 0; j < examples.size(); j++) {
                                 // DEBUG
                                 listaDesconhecidos.remove(examples.get(j));
-
                                 // DEBUG
                                 double trueLabel = examples.get(j).getRotuloVerdadeiro();
                                 updateConfusionMatrix(trueLabel,trueLabel,confusionMatrix);

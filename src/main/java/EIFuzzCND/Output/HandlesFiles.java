@@ -43,19 +43,20 @@ public class HandlesFiles {
         buf_writer.close();
     }
 
-    public static void salvaAcuracia(int tempo, double acuracia, String dataset, int latencia, double percentLabeled, int unkMen, boolean append) throws IOException {
+    public static void salvaMetrics(int tempo, double acuracia, double precision, double recall, double f1Score, String dataset, int latencia, double percentLabeled, int unkMen,double unknownRate, boolean append) throws IOException {
         String current = (new File(".")).getCanonicalPath();
         FileWriter writer = new FileWriter(current + "/datasets" + "/" + dataset + "/" + dataset  + latencia + "-" + percentLabeled + "-EIFuzzCND-acuracia.csv", append);
         BufferedWriter buf_writer = new BufferedWriter(writer);
         if (!append) {
-            buf_writer.write("Tempo, Acurácia, unkMen");
+            buf_writer.write("Tempo, Acurácia, Precision, Recall, F1-Score, unkMen, unknownRate");
             buf_writer.newLine();
         }
-        String line = tempo + "," + acuracia + "," + unkMen;
+        String line = tempo + "," + acuracia + "," + precision + "," + recall + "," + f1Score + "," + unkMen + "," + unknownRate;
         buf_writer.write(line);
         buf_writer.newLine();
         buf_writer.close();
     }
+
 
 
 
@@ -113,7 +114,6 @@ public class HandlesFiles {
                 str.nextToken(); // skip first column
                 Double novelty = Double.parseDouble(str.nextToken());
                 measures.add(novelty);
-                System.out.println();
             };
             inReader.close();
             return measures;
@@ -123,12 +123,13 @@ public class HandlesFiles {
         return null;
     }
 
-    public static void loadAcuracia(String caminho, int numAnalises, List<Double> acuraciasFuzzCND, List<Double> unkRFuzzCND) {
+
+    public static void loadMetrics(String caminho, int numAnalises, List<Double> acuraciasFuzzCND, List<Double> precisoesFuzzCND, List<Double> recallsFuzzCND, List<Double> f1ScoresFuzzCND, List<Double> unkRFuzzCND, ArrayList<Double> unknownRateFuzzCND) {
         BufferedReader inReader = null;
         try {
             inReader = new BufferedReader(new FileReader(caminho));
         } catch (FileNotFoundException e) {
-            System.err.println("loadAcuracia - Não foi possível abrir o arquivo: " + caminho);
+            System.err.println("loadMetrics - Não foi possível abrir o arquivo: " + caminho);
             System.exit(1);
         }
 
@@ -138,8 +139,8 @@ public class HandlesFiles {
             // Read header row
             line = inReader.readLine();
             // Check header
-            if (!line.equals("Tempo, Acurácia, unkMen")) {
-                System.err.println("loadAcuracia - Formato de cabeçalho inválido no arquivo: " + caminho);
+            if (!line.equals("Tempo, Acurácia, Precision, Recall, F1-Score, unkMen, unknownRate")) {
+                System.err.println("loadMetrics - Formato de cabeçalho inválido no arquivo: " + caminho);
                 System.exit(1);
             }
             for (int i = 0; i < numAnalises; i++) {
@@ -147,19 +148,23 @@ public class HandlesFiles {
                 str = new StringTokenizer(line, ",");
                 str.nextToken(); // skip first column
                 Double acuracia = Double.parseDouble(str.nextToken()) * 100;
+                Double precision = Double.parseDouble(str.nextToken()) * 100;
+                Double recall = Double.parseDouble(str.nextToken()) * 100;
+                Double f1Score = Double.parseDouble(str.nextToken()) * 100;
                 Double unkMen = Double.parseDouble(str.nextToken());
+                Double unknownRate = Double.parseDouble(str.nextToken()) * 100;
                 acuraciasFuzzCND.add(acuracia);
+                precisoesFuzzCND.add(precision);
+                recallsFuzzCND.add(recall);
+                f1ScoresFuzzCND.add(f1Score);
                 unkRFuzzCND.add(unkMen);
+                unknownRateFuzzCND.add(unknownRate);
             }
             inReader.close();
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
     }
-
-
-
-
 
 }
 

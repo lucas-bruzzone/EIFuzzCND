@@ -24,10 +24,6 @@ public class OfflinePhase {
         this.minWeight = minWeight;
     }
 
-    // Reset method
-    public void reset() {
-        this.supervisedModel = null;
-    }
 
     public SupervisedModel inicializar(Instances trainSet) throws Exception {
         if (this.supervisedModel == null) {

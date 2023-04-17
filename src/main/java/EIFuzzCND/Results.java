@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
-import static EIFuzzCND.Output.HandlesFiles.loadAcuracia;
 
 public class Results {
     public static void main(String[] args) throws IOException, ParseException {
@@ -22,7 +21,7 @@ public class Results {
         String percentedLabeled = "1.0";
         Map<Integer, List<ResultsForExample>> resultsEIFuzzCND = new HashMap<>();
         ArrayList<Double> novidades;
-        for(int i =0 ; i<latencia.length;i++) {
+        for (int i = 0; i < latencia.length; i++) {
 
             String caminhoTrain = current + "/datasets/" + dataset + "/" + dataset + "-train.csv";
             String caminhoResultados = current + "/datasets/" + dataset + "/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-results.csv";
@@ -42,19 +41,23 @@ public class Results {
             novidades = HandlesFiles.loadNovelties(caminhoNovidades, countNovelties);
 
             ArrayList<Double> acuraciasFuzzCND = new ArrayList<>();
+            ArrayList<Double> precisoesFuzzCND = new ArrayList<>();
+            ArrayList<Double> recallsFuzzCND = new ArrayList<>();
+            ArrayList<Double> f1ScoresFuzzCND = new ArrayList<>();
             ArrayList<Double> unkRFuzzCND = new ArrayList<>();
+            ArrayList<Double> unknownRate = new ArrayList<>();
 
-            HandlesFiles.loadAcuracia(caminhoAcuracia, countAcuracias, acuraciasFuzzCND, unkRFuzzCND);
+
+            HandlesFiles.loadMetrics(caminhoAcuracia, countAcuracias, acuraciasFuzzCND, precisoesFuzzCND, recallsFuzzCND, f1ScoresFuzzCND, unkRFuzzCND, unknownRate);
 
             ArrayList<List<Double>> metricasFuzzCND = new ArrayList<>();
 
             List<String> rotulos = new ArrayList<>();
             rotulos.add("Accuracy");
-            rotulos.add("UnkR");
-
+            rotulos.add("unknownRate");
 
             metricasFuzzCND.add(acuraciasFuzzCND);
-            metricasFuzzCND.add(unkRFuzzCND);
+            metricasFuzzCND.add(unknownRate);
 
             LineChart_AWT chart2 = new LineChart_AWT(
                     latencia[i],
@@ -65,21 +68,6 @@ public class Results {
             chart2.setVisible(true);
         }
 
-
-
-
-    }
-
-    public static double calculaUnkR(Map<String, Integer> unki, Map<String, Integer> exci) {
-        List<String> rotulos = new ArrayList<>();
-        rotulos.addAll(unki.keySet());
-        double unkR = 0;
-        for(int i=0; i< unki.size(); i++) {
-            double unk = unki.get(rotulos.get(i));
-            double exc = exci.get(rotulos.get(i));
-            unkR += (unk/exc);
-        }
-        return (unkR/ exci.size()) * 100;
     }
 
 
@@ -164,7 +152,5 @@ public class Results {
         }
         return lineValues;
     }
-
-
 
 }

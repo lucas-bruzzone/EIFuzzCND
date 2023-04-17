@@ -38,18 +38,11 @@ public class LineChart_AWT extends ApplicationFrame {
                 PlotOrientation.VERTICAL,
                 true,true,false);
 
-        JFreeChart lineChart2 = ChartFactory.createXYLineChart(
-                chartTitle,
-                null,null,
-                null,
-                PlotOrientation.VERTICAL,
-                false,false,false);
 
         Font font3 = new Font("SansSerif", Font.PLAIN, 12);
         Font font4 = new Font("SansSerif", Font.PLAIN, 14);
         XYPlot xyplot = (XYPlot) lineChart.getPlot();
 
-        XYPlot xyplot2 = (XYPlot) lineChart2.getPlot();
 
         ValueAxis rangeAxis = xyplot.getRangeAxis();
         rangeAxis.setRange(0.0, 50);
@@ -57,26 +50,15 @@ public class LineChart_AWT extends ApplicationFrame {
         rangeAxis.setLabelFont(font4);
         rangeAxis.setTickLabelPaint(Color.black);
 
-        ValueAxis rangeAxis2 = xyplot2.getRangeAxis();
-        Axis axis2 = xyplot2.getDomainAxis();
-        axis2.setTickLabelsVisible(false);
-        axis2.setTickMarksVisible(false);
-        axis2.setMinorTickMarksVisible(false);
-        axis2.setAxisLineVisible(false);
 
 
-        rangeAxis2.setTickLabelsVisible(false);
-        rangeAxis2.setAxisLineVisible(false);
-        rangeAxis2.setNegativeArrowVisible(false);
-        rangeAxis2.setPositiveArrowVisible(false);
-        rangeAxis2.setTickMarksVisible(false);
 
         final Stroke DEFAULT_GRIDLINE_STROKE = new BasicStroke(1.4F, 0, 2, 0.0F, new float[]{4.0F, 4.0F}, 0.0F);
 
 
         final XYPlot plot2 = lineChart.getXYPlot();
         final XYPlot plotAux3 = lineChart.getXYPlot();
-        final XYPlot plotGraphSmall = lineChart2.getXYPlot();
+
         ValueMarker markerSmall;
 
         for (Integer classe : novasClasses) {
@@ -107,9 +89,7 @@ public class LineChart_AWT extends ApplicationFrame {
         xyplot.setDomainGridlinePaint(Color.white);
         xyplot.setRangeGridlinePaint(Color.white);
 
-        xyplot2.setBackgroundPaint(Color.white);
-        xyplot2.setDomainGridlinePaint(Color.white);
-        xyplot2.setRangeGridlinePaint(Color.white);
+
 
         XYItemRenderer r = xyplot.getRenderer();
         r.setSeriesStroke(0, new BasicStroke(3.0f));
@@ -125,8 +105,6 @@ public class LineChart_AWT extends ApplicationFrame {
         r.setSeriesPaint(4, new Color(180, 67, 108));
 
 
-        ChartPanel charSuperior = new ChartPanel(lineChart2);
-        charSuperior.setPreferredSize(new Dimension(680, 50));
 
         final CombinedDomainXYPlot plotGraph = new CombinedDomainXYPlot(new NumberAxis("Evaluation moments"));
         ValueAxis plotAxis = xyplot.getRangeAxis();
@@ -134,7 +112,6 @@ public class LineChart_AWT extends ApplicationFrame {
         plotGraph.setGap(10.0);
 
         // add the subplots...
-        plotGraph.add(xyplot2, 1);
         plotGraph.add(xyplot, 9);
         plotGraph.setOrientation(PlotOrientation.VERTICAL);
         plotGraph.setBackgroundPaint(Color.white);
@@ -149,18 +126,19 @@ public class LineChart_AWT extends ApplicationFrame {
     }
 
 
-    private XYDataset createDatasetAcuracia(List<List<Double>> acuracias, List<String> rotuloClassificadores) throws ParseException {
-        XYSeriesCollection dataset = new XYSeriesCollection();
-        XYSeries series1 = new XYSeries(rotuloClassificadores.get(0));
-        XYSeries series2 = new XYSeries(rotuloClassificadores.get(1));
-        for(int i=0; i<acuracias.get(0).size(); i++) {
-                series1.add(NumberFormat.getInstance().parse(Integer.toString(i + 1)), acuracias.get(0).get(i));
-                series2.add(NumberFormat.getInstance().parse(Integer.toString(i + 1)), acuracias.get(1).get(i));
+    private XYDataset createDatasetAcuracia(List<List<Double>> metricas, List<String> rotulos) {
+        final XYSeriesCollection dataset = new XYSeriesCollection();
+        for (int i = 0; i < metricas.size(); i++) {
+            final XYSeries serie = new XYSeries(rotulos.get(i));
+            final List<Double> valoresMetrica = metricas.get(i);
+            for (int j = 0; j < valoresMetrica.size(); j++) {
+                serie.add(j+1, valoresMetrica.get(j));
+            }
+            dataset.addSeries(serie);
         }
-        dataset.addSeries(series1);
-        dataset.addSeries(series2);
         return dataset;
     }
+
 
 
 

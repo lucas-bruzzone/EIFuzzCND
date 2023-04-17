@@ -1,8 +1,8 @@
 package EIFuzzCND.ConfusionMatrix;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import EIFuzzCND.Structs.Example;
+
+import java.util.*;
 
 
 public class ConfusionMatrix {
@@ -56,40 +56,51 @@ public class ConfusionMatrix {
     }
 
 
-    public Map<Double, Double> getClassesWithMaxCount() {
-        Map<Double, Double> result = new HashMap<>();
+    public Map<Double, List<Double>> getClassesWithNonZeroCount() {
+        Map<Double, List<Double>> result = new HashMap<>();
         for (Double trueClass : matrix.keySet()) {
-            Double predictedClassWithMaxCount = null;
-            int maxCount = 0;
-            for (Double predictedClass : matrix.keySet()) {
-                int count = matrix.get(trueClass).get(predictedClass);
-                if (count > maxCount) {
-                    predictedClassWithMaxCount = predictedClass;
-                    maxCount = count;
-                } else if (count == maxCount && predictedClassWithMaxCount != null && predictedClass > 100 && predictedClass < predictedClassWithMaxCount) {
-                    predictedClassWithMaxCount = predictedClass;
+            if (trueClass >= 0 && trueClass < 100) {
+                List<Double> predictedClassesWithNonZeroCount = new ArrayList<>();
+                int maxCount = 0;
+                    for (Double predictedClass : matrix.keySet()) {
+                    if (predictedClass >= 0) {
+                        int count = matrix.get(trueClass).get(predictedClass);
+                        if (count > 0) {
+                            predictedClassesWithNonZeroCount.add(predictedClass);
+                        }
+                    }
                 }
-            }
-            if (predictedClassWithMaxCount != null) {
-                result.put(trueClass, predictedClassWithMaxCount);
+                if (!predictedClassesWithNonZeroCount.isEmpty()) {
+                    result.put(trueClass, predictedClassesWithNonZeroCount);
+                }
             }
         }
         return result;
     }
 
 
-    public void mergeClasses(Map<Double, Double> labels) {
-        // percorre todos os pares de rótulos
-        for (Map.Entry<Double, Double> entry : labels.entrySet()) {
-            Double label1 = entry.getKey();
-            Double label2 = entry.getValue();
 
-            // verifica se ambos os rótulos existem na matriz de confusão e se não são iguais
-            if (matrix.containsKey(label1) && matrix.containsKey(label2) && !label1.equals(label2)) {
-                // verfica se nenhum dos rótulos tem o valor -1.0
-                if (label1 != -1.0 && label2 != -1.0) {
-                    Map<Double, Integer> row1 = matrix.get(label1);
-                    Map<Double, Integer> row2 = matrix.get(label2);
+
+
+
+    public void mergeClasses(Map<Double, List<Double>> labels) {
+        // percorre todas as classes que precisam ser fundidas
+        for (Map.Entry<Double, List<Double>> entry : labels.entrySet()) {
+            Double srcLabel = entry.getKey();
+            List<Double> destLabels = entry.getValue();
+
+            // verifica se a classe de origem existe na matriz de confusão
+            if (!matrix.containsKey(srcLabel)) {
+                continue;
+            }
+
+            Map<Double, Integer> row1 = matrix.get(srcLabel);
+
+            // percorre todas as classes de destino
+            for (Double destLabel : destLabels) {
+                // verifica se a classe de destino existe na matriz de confusão e se não é igual à classe de origem
+                if (matrix.containsKey(destLabel) && !srcLabel.equals(destLabel)) {
+                    Map<Double, Integer> row2 = matrix.get(destLabel);
 
                     // soma os valores de cada coluna da segunda linha na primeira linha
                     for (Map.Entry<Double, Integer> entry2 : row2.entrySet()) {
@@ -100,36 +111,36 @@ public class ConfusionMatrix {
                     }
 
                     // remove a segunda linha da matriz
-                    matrix.remove(label2);
+                    matrix.remove(destLabel);
 
                     // para cada coluna, soma os valores da segunda coluna na primeira coluna
                     for (Map.Entry<Double, Map<Double, Integer>> rowEntry : matrix.entrySet()) {
                         Double rowLabel = rowEntry.getKey();
                         Map<Double, Integer> row = rowEntry.getValue();
 
-                        if (row.containsKey(label2)) {
-                            Integer value2 = row.get(label2);
-                            row.put(label1, row.getOrDefault(label1, 0) + value2);
-                            row.remove(label2);
+                        if (row.containsKey(destLabel)) {
+                            Integer value2 = row.get(destLabel);
+                            row.put(srcLabel, row.getOrDefault(srcLabel, 0) + value2);
+                            row.remove(destLabel);
                         }
                     }
 
                     // adiciona o último merge ao mapa lastMerge
-                    lastMerge.put(label1, label2);
+                    lastMerge.put(srcLabel, destLabel);
                 }
             }
         }
 
-        // verifica se o último merge contém o rótulo que precisa ser verificado
+        // verifica se as classes de origem do último merge ainda precisam ser fundidas
         for (Map.Entry<Double, Double> entry : lastMerge.entrySet()) {
-            Double label1 = entry.getKey();
-            Double label2 = entry.getValue();
-            if (matrix.containsKey(label2)) {
-                mergeClasses(Collections.singletonMap(label1, label2));
-                break;
+            Double srcLabel = entry.getKey();
+            Double destLabel = entry.getValue();
+            if (matrix.containsKey(destLabel)) {
+                mergeClasses(Collections.singletonMap(srcLabel, Arrays.asList(destLabel)));
             }
         }
     }
+
 
 
     public void updateConfusionMatrix(double trueLabel) {
@@ -141,9 +152,17 @@ public class ConfusionMatrix {
 
 
 
-    public double calculateAccuracy() {
-        int correctPredictions = 0;
-        int totalSamples = 0;
+    public Metrics calculateMetrics(int tempo, int unkMem) {
+        double truePositive = 0;
+        double falsePositive = 0;
+        double trueNegative = 0;
+        double falseNegative = 0;
+        double totalSamples = 0;
+        double accuracy = 0;
+        double precision = 0;
+        double recall = 0;
+        double f1Score = 0;
+        double unknownCount = 0; // adiciona a contagem de exemplos desconhecidos
 
         for (Map.Entry<Double, Map<Double, Integer>> rowEntry : matrix.entrySet()) {
             Double trueLabel = rowEntry.getKey();
@@ -152,17 +171,44 @@ public class ConfusionMatrix {
             for (Map.Entry<Double, Integer> entry : row.entrySet()) {
                 Double predictedLabel = entry.getKey();
                 Integer count = entry.getValue();
+                totalSamples += count;
 
                 if (trueLabel.equals(predictedLabel)) {
-                    correctPredictions += count;
+                    truePositive += count;
+                } else {
+                    falsePositive += row.containsKey(predictedLabel) ? count : 0;
+                    falseNegative += matrix.containsKey(trueLabel) ? count : 0;
                 }
 
-                totalSamples += count;
+                // verifica se a predição foi -1 e incrementa a contagem
+                if (predictedLabel == -1) {
+                    unknownCount += count;
+                }
             }
         }
 
-        return (double) correctPredictions / totalSamples;
+        trueNegative = totalSamples - truePositive - falsePositive - falseNegative;
+
+        accuracy = (truePositive + trueNegative) / totalSamples;
+
+        if (truePositive + falsePositive != 0) {
+            precision = truePositive / (truePositive + falsePositive);
+        }
+
+        if (truePositive + falseNegative != 0) {
+            recall = truePositive / (truePositive + falseNegative);
+        }
+
+        if (precision + recall != 0) {
+            f1Score = 2 * precision * recall / (precision + recall);
+        }
+
+        double unknownRate = unknownCount / totalSamples; // calcula a taxa de exemplos desconhecidos
+        Metrics metrics = new Metrics(accuracy, precision, recall, f1Score,tempo,unkMem, unknownRate); // adiciona a taxa de exemplos desconhecidos nos resultados
+        return metrics;
     }
+
+
 
     public int countUnknow() {
         int count = 0;
@@ -174,8 +220,6 @@ public class ConfusionMatrix {
         }
         return count;
     }
-
-
 
 
 }
