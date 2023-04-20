@@ -43,7 +43,7 @@ public class HandlesFiles {
         buf_writer.close();
     }
 
-    public static void salvaMetrics(int tempo, double acuracia, double precision, double recall, double f1Score, String dataset, int latencia, double percentLabeled, int unkMen,double unknownRate, boolean append) throws IOException {
+    public static void salvaMetrics(int tempo, double acuracia, double precision, double recall, double f1Score, String dataset, int latencia, double percentLabeled, double unkMen,double unknownRate, boolean append) throws IOException {
         String current = (new File(".")).getCanonicalPath();
         FileWriter writer = new FileWriter(current + "/datasets" + "/" + dataset + "/" + dataset  + latencia + "-" + percentLabeled + "-EIFuzzCND-acuracia.csv", append);
         BufferedWriter buf_writer = new BufferedWriter(writer);

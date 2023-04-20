@@ -1,14 +1,14 @@
 package EIFuzzCND.ConfusionMatrix;
 
 public class Metrics {
-    private double accuracy;
-    private double precision;
-    private double recall;
-    private double f1Score;
-    private int tempo;
-    private int unkMem;
-    private double unknownRate;
-    public Metrics(double accuracy, double precision, double recall, double f1Score, int tempo, int unkMem, double unknownRate) {
+    private final double accuracy;
+    private final double precision;
+    private final double recall;
+    private final double f1Score;
+    private final int tempo;
+    private final double unkMem;
+    private final double unknownRate;
+    public Metrics(double accuracy, double precision, double recall, double f1Score, int tempo, double unkMem, double unknownRate) {
         this.accuracy = accuracy;
         this.precision = precision;
         this.recall = recall;
@@ -39,7 +39,7 @@ public class Metrics {
     }
 
 
-    public int getUnkMem() {
+    public double getUnkMem() {
         return unkMem;
     }
 

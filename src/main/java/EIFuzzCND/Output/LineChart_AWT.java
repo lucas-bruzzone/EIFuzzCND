@@ -2,6 +2,7 @@ package EIFuzzCND.Output;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.Axis;
 import org.jfree.chart.axis.NumberAxis;
@@ -18,7 +19,8 @@ import org.jfree.ui.ApplicationFrame;
 
 
 import java.awt.*;
-import java.text.NumberFormat;
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ import java.util.List;
 
 public class LineChart_AWT extends ApplicationFrame {
 
-    public LineChart_AWT(String applicationTitle , String chartTitle, List<List<Double>> acuracias, List<String> rotuloClassificadores, List<Double> novidades, ArrayList<Integer> novasClasses) throws ParseException {
+    public LineChart_AWT(String applicationTitle , String chartTitle, List<List<Double>> acuracias, List<String> rotuloClassificadores, List<Double> novidades, ArrayList<Integer> novasClasses, String nomeDataset , String percentedLabel ) throws ParseException, IOException {
         super(applicationTitle);
         XYDataset dataset;
         dataset = createDatasetAcuracia(acuracias, rotuloClassificadores);
@@ -38,18 +40,39 @@ public class LineChart_AWT extends ApplicationFrame {
                 PlotOrientation.VERTICAL,
                 true,true,false);
 
+        JFreeChart lineChart2 = ChartFactory.createXYLineChart(
+                chartTitle,
+                null,null,
+                null,
+                PlotOrientation.VERTICAL,
+                false,false,false);
+
 
         Font font3 = new Font("SansSerif", Font.PLAIN, 12);
         Font font4 = new Font("SansSerif", Font.PLAIN, 14);
         XYPlot xyplot = (XYPlot) lineChart.getPlot();
+        XYPlot xyplot2 = (XYPlot) lineChart2.getPlot();
 
 
         ValueAxis rangeAxis = xyplot.getRangeAxis();
+
         rangeAxis.setRange(0.0, 50);
         rangeAxis.setLabelPaint(Color.black);
         rangeAxis.setLabelFont(font4);
         rangeAxis.setTickLabelPaint(Color.black);
 
+        ValueAxis rangeAxis2 = xyplot2.getRangeAxis();
+        Axis axis2 = xyplot2.getDomainAxis();
+        axis2.setTickLabelsVisible(false);
+        axis2.setTickMarksVisible(false);
+        axis2.setMinorTickMarksVisible(false);
+        axis2.setAxisLineVisible(false);
+
+        rangeAxis2.setTickLabelsVisible(false);
+        rangeAxis2.setAxisLineVisible(false);
+        rangeAxis2.setNegativeArrowVisible(false);
+        rangeAxis2.setPositiveArrowVisible(false);
+        rangeAxis2.setTickMarksVisible(false);
 
 
 
@@ -59,7 +82,6 @@ public class LineChart_AWT extends ApplicationFrame {
         final XYPlot plot2 = lineChart.getXYPlot();
         final XYPlot plotAux3 = lineChart.getXYPlot();
 
-        ValueMarker markerSmall;
 
         for (Integer classe : novasClasses) {
             ValueMarker marker = new ValueMarker(classe);
@@ -71,6 +93,14 @@ public class LineChart_AWT extends ApplicationFrame {
             marker2.setPaint(Color.black);
             marker2.setStroke(DEFAULT_GRIDLINE_STROKE);
             plotAux3.addDomainMarker(marker2);
+
+
+            final XYPlot plotGraphSmall = lineChart2.getXYPlot();
+            ValueMarker markerSmall;
+            markerSmall = new ValueMarker(classe);
+            markerSmall.setPaint(Color.black);
+            markerSmall.setStroke(DEFAULT_GRIDLINE_STROKE);
+            plotGraphSmall.addDomainMarker(markerSmall);
         }
 
        for(int i=0; i<novidades.size(); i++) {
@@ -81,6 +111,7 @@ public class LineChart_AWT extends ApplicationFrame {
                 marker5.setPaint(Color.gray);
                 marker5.setStroke(new BasicStroke(1.5f));
                 plotAux.addDomainMarker(marker5);
+
             }
         }
 
@@ -89,6 +120,9 @@ public class LineChart_AWT extends ApplicationFrame {
         xyplot.setDomainGridlinePaint(Color.white);
         xyplot.setRangeGridlinePaint(Color.white);
 
+        xyplot2.setBackgroundPaint(Color.white);
+        xyplot2.setDomainGridlinePaint(Color.white);
+        xyplot2.setRangeGridlinePaint(Color.white);
 
 
         XYItemRenderer r = xyplot.getRenderer();
@@ -112,6 +146,7 @@ public class LineChart_AWT extends ApplicationFrame {
         plotGraph.setGap(10.0);
 
         // add the subplots...
+        plotGraph.add(xyplot2, 1);
         plotGraph.add(xyplot, 9);
         plotGraph.setOrientation(PlotOrientation.VERTICAL);
         plotGraph.setBackgroundPaint(Color.white);
@@ -122,6 +157,17 @@ public class LineChart_AWT extends ApplicationFrame {
         panel.setPreferredSize(new Dimension(680, 450));
         panel.setBackground(Color.white);
         setContentPane(panel);
+
+
+        String current = (new File(".")).getCanonicalPath();
+
+        String caminhoGraphics = current + "/graphics/" + nomeDataset + "/" + nomeDataset + applicationTitle + percentedLabel + ".png";
+        File file = new File(caminhoGraphics);
+        try {
+            ChartUtilities.saveChartAsPNG(file, panel.getChart(), 680, 450);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

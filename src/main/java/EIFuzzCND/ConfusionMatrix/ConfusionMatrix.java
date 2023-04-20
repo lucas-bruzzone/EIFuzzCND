@@ -1,7 +1,5 @@
 package EIFuzzCND.ConfusionMatrix;
 
-import EIFuzzCND.Structs.Example;
-
 import java.util.*;
 
 
@@ -152,7 +150,7 @@ public class ConfusionMatrix {
 
 
 
-    public Metrics calculateMetrics(int tempo, int unkMem) {
+    public Metrics calculateMetrics(int tempo, double unkMem, double exc) {
         double truePositive = 0;
         double falsePositive = 0;
         double trueNegative = 0;
@@ -203,7 +201,8 @@ public class ConfusionMatrix {
             f1Score = 2 * precision * recall / (precision + recall);
         }
 
-        double unknownRate = unknownCount / totalSamples; // calcula a taxa de exemplos desconhecidos
+        double unknownRate = (unkMem / exc); // calcula a taxa de exemplos desconhecidos
+
         Metrics metrics = new Metrics(accuracy, precision, recall, f1Score,tempo,unkMem, unknownRate); // adiciona a taxa de exemplos desconhecidos nos resultados
         return metrics;
     }

@@ -14,6 +14,8 @@ import java.util.*;
 
 
 public class Results {
+    private static int divisor = 1000;
+
     public static void main(String[] args) throws IOException, ParseException {
         String current = (new File(".")).getCanonicalPath();
         String dataset = "moa";
@@ -40,17 +42,19 @@ public class Results {
 
             novidades = HandlesFiles.loadNovelties(caminhoNovidades, countNovelties);
 
-            ArrayList<Double> acuraciasFuzzCND = new ArrayList<>();
+
             ArrayList<Double> precisoesFuzzCND = new ArrayList<>();
             ArrayList<Double> recallsFuzzCND = new ArrayList<>();
             ArrayList<Double> f1ScoresFuzzCND = new ArrayList<>();
-            ArrayList<Double> unkRFuzzCND = new ArrayList<>();
             ArrayList<Double> unknownRate = new ArrayList<>();
-
+            ArrayList<Double> acuraciasFuzzCND = new ArrayList<>();
+            ArrayList<Double> unkRFuzzCND = new ArrayList<>();
 
             HandlesFiles.loadMetrics(caminhoAcuracia, countAcuracias, acuraciasFuzzCND, precisoesFuzzCND, recallsFuzzCND, f1ScoresFuzzCND, unkRFuzzCND, unknownRate);
 
             ArrayList<List<Double>> metricasFuzzCND = new ArrayList<>();
+
+
 
             List<String> rotulos = new ArrayList<>();
             rotulos.add("Accuracy");
@@ -59,9 +63,10 @@ public class Results {
             metricasFuzzCND.add(acuraciasFuzzCND);
             metricasFuzzCND.add(unknownRate);
 
+
             LineChart_AWT chart2 = new LineChart_AWT(
                     latencia[i],
-                    latencia[i], metricasFuzzCND, rotulos, novidades, novasClasses);
+                    latencia[i], metricasFuzzCND, rotulos, novidades, novasClasses,dataset,percentedLabeled);
 
             chart2.pack();
             RefineryUtilities.centerFrameOnScreen(chart2);
@@ -136,7 +141,7 @@ public class Results {
                 Double value = Double.parseDouble(row[1]);
                 if (!seenValues.contains(value) && !distinctValues.contains(value)) {
                     seenValues.add(value);
-                    lineValues.add((lineCounter - 1) / 1000);
+                    lineValues.add((lineCounter - 1) / divisor);
                 }
             }
         } catch (IOException e) {
@@ -152,5 +157,4 @@ public class Results {
         }
         return lineValues;
     }
-
 }
