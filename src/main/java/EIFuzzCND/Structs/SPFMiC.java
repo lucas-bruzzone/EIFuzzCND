@@ -23,6 +23,7 @@ public class SPFMiC implements Instance {
     private double centroide[];
     private double alpha;
     private double theta;
+    private boolean isObsolete;
     private boolean isNull;
 
 
@@ -41,6 +42,7 @@ public class SPFMiC implements Instance {
         this.created = t;
         this.SSDe = 0;
         this.t = t;
+        this.isObsolete = false;
     }
 
     public double[] getCF1pertinencias() {
@@ -156,23 +158,18 @@ public class SPFMiC implements Instance {
     }
 
 
-
-    public double getRadius() {
-        return Math.sqrt((this.SSDe/this.N));
-    }
-
-
-
     //1.5 kdd
     //1.5 ou 2 cover
     //4 synedc
     //2 rbf e moa
     public double getRadiusWithWeight() {
-        return Math.sqrt((this.SSDe/this.N)) * 1.5;
+        return Math.sqrt((this.SSDe/this.N))  * 1.5 ;
     }
-
-    public double getRadiusNsModel() {
-        return Math.sqrt((this.SSDe/this.N));
+    public double getRadiusND() {
+        return Math.sqrt((this.SSDe/this.N)) ;
+    }
+    public double getRadiusUnsupervised() {
+        return Math.sqrt((this.SSDe/this.N)) ;
     }
 
     @Override
@@ -439,4 +436,11 @@ public class SPFMiC implements Instance {
         Te = te;
     }
 
+    public void setObsolete(boolean b) {
+        this.isObsolete = true;
+    }
+
+    public boolean isObsolete() {
+        return isObsolete;
+    }
 }

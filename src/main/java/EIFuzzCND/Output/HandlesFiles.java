@@ -13,7 +13,7 @@ public class HandlesFiles {
         FileWriter writer;
         BufferedWriter buf_writer;
         String current = (new File(".")).getCanonicalPath();
-        writer = new FileWriter(current + "/datasets/" + arquivo + "/" + arquivo + latencia +  "-" + percentLabeled  + "-EIFuzzCND-novelties" + ".csv");
+        writer = new FileWriter(current + "/datasets/" + arquivo + "/graphics_data/" + arquivo + latencia +  "-" + percentLabeled  + "-EIFuzzCND-novelties" + ".csv");
         buf_writer = new BufferedWriter(writer);
         buf_writer.write("Linha, Novidade");
         buf_writer.newLine();
@@ -30,7 +30,7 @@ public class HandlesFiles {
         FileWriter writer;
         BufferedWriter buf_writer;
         String current = (new File(".")).getCanonicalPath();
-        writer = new FileWriter(current + "/datasets/" + arquivo + "/" + arquivo  + latencia +  "-" + percentLabeled + "-EIFuzzCND-results" + ".csv");
+        writer = new FileWriter(current + "/datasets/" + arquivo +  "/graphics_data/" + arquivo  + latencia +  "-" + percentLabeled + "-EIFuzzCND-results" + ".csv");
         buf_writer = new BufferedWriter(writer);
         buf_writer.write("Linha, Rotulo Verdadeiro, Rotulo Classificado");
         buf_writer.newLine();
@@ -45,7 +45,7 @@ public class HandlesFiles {
 
     public static void salvaMetrics(int tempo, double acuracia, double precision, double recall, double f1Score, String dataset, int latencia, double percentLabeled, double unkMen,double unknownRate, boolean append) throws IOException {
         String current = (new File(".")).getCanonicalPath();
-        FileWriter writer = new FileWriter(current + "/datasets" + "/" + dataset + "/" + dataset  + latencia + "-" + percentLabeled + "-EIFuzzCND-acuracia.csv", append);
+        FileWriter writer = new FileWriter(current + "/datasets" + "/" + dataset + "/graphics_data/" + dataset  + latencia + "-" + percentLabeled + "-EIFuzzCND-acuracia.csv", append);
         BufferedWriter buf_writer = new BufferedWriter(writer);
         if (!append) {
             buf_writer.write("Tempo, Acurácia, Precision, Recall, F1-Score, unkMen, unknownRate");

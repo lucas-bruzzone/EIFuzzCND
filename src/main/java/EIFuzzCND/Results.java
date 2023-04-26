@@ -19,16 +19,16 @@ public class Results {
     public static void main(String[] args) throws IOException, ParseException {
         String current = (new File(".")).getCanonicalPath();
         String dataset = "moa";
-        String[] latencia = {"10000000"};//"2000","5000","10000","10000000","10000"
+        String[] latencia = {"2000","5000","10000","10000000"};//"2000","5000","10000","10000000"
         String percentedLabeled = "1.0";
         Map<Integer, List<ResultsForExample>> resultsEIFuzzCND = new HashMap<>();
         ArrayList<Double> novidades;
         for (int i = 0; i < latencia.length; i++) {
 
             String caminhoTrain = current + "/datasets/" + dataset + "/" + dataset + "-train.csv";
-            String caminhoResultados = current + "/datasets/" + dataset + "/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-results.csv";
-            String caminhoNovidades = current + "/datasets/" + dataset + "/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-novelties.csv";
-            String caminhoAcuracia = current + "/datasets/" + dataset + "/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-acuracia.csv";
+            String caminhoResultados = current + "/datasets/" + dataset + "/graphics_data/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-results.csv";
+            String caminhoNovidades = current + "/datasets/" + dataset + "/graphics_data/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-novelties.csv";
+            String caminhoAcuracia = current + "/datasets/" + dataset + "/graphics_data/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-acuracia.csv";
 
 
             ArrayList<Double> classesTreinamento = checkLastColumn(caminhoTrain);

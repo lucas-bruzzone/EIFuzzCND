@@ -8,7 +8,6 @@ public class ConfusionMatrix {
 
     private Map<Double, Double> lastMerge = new HashMap<>();
 
-
     public ConfusionMatrix() {
         matrix = new HashMap<>();
     }
@@ -61,7 +60,7 @@ public class ConfusionMatrix {
                 List<Double> predictedClassesWithNonZeroCount = new ArrayList<>();
                 int maxCount = 0;
                     for (Double predictedClass : matrix.keySet()) {
-                    if (predictedClass >= 0) {
+                    if (predictedClass > 100) {
                         int count = matrix.get(trueClass).get(predictedClass);
                         if (count > 0) {
                             predictedClassesWithNonZeroCount.add(predictedClass);
@@ -77,11 +76,8 @@ public class ConfusionMatrix {
     }
 
 
-
-
-
-
     public void mergeClasses(Map<Double, List<Double>> labels) {
+
         // percorre todas as classes que precisam ser fundidas
         for (Map.Entry<Double, List<Double>> entry : labels.entrySet()) {
             Double srcLabel = entry.getKey();
@@ -153,14 +149,13 @@ public class ConfusionMatrix {
     public Metrics calculateMetrics(int tempo, double unkMem, double exc) {
         double truePositive = 0;
         double falsePositive = 0;
-        double trueNegative = 0;
+        double trueNegative;
         double falseNegative = 0;
         double totalSamples = 0;
-        double accuracy = 0;
+        double accuracy;
         double precision = 0;
         double recall = 0;
         double f1Score = 0;
-        double unknownCount = 0; // adiciona a contagem de exemplos desconhecidos
 
         for (Map.Entry<Double, Map<Double, Integer>> rowEntry : matrix.entrySet()) {
             Double trueLabel = rowEntry.getKey();
@@ -176,11 +171,6 @@ public class ConfusionMatrix {
                 } else {
                     falsePositive += row.containsKey(predictedLabel) ? count : 0;
                     falseNegative += matrix.containsKey(trueLabel) ? count : 0;
-                }
-
-                // verifica se a predição foi -1 e incrementa a contagem
-                if (predictedLabel == -1) {
-                    unknownCount += count;
                 }
             }
         }

@@ -57,9 +57,6 @@ public class Example implements Instance, Clusterable {
         return this.rotuloVerdadeiro;
     }
 
-    public void setRotuloVerdadeiro(double rotuloVerdadeiro) {
-        this.rotuloVerdadeiro = rotuloVerdadeiro;
-    }
 
     public double getRotuloClassificado() {
         return this.rotuloClassificado;
@@ -73,41 +70,19 @@ public class Example implements Instance, Clusterable {
         return ponto;
     }
 
-    public void setPonto(double[] ponto) {
-        this.ponto = ponto;
-    }
 
     public int getTime() {
         return time;
     }
 
-    public void setTime(int time) {
-        this.time = time;
-    }
 
-    public boolean isDesconhecido() {
-        return desconhecido;
-    }
-
-    public void setDesconhecido() {
-        this.desconhecido = true;
-    }
 
     public double getPontoPorPosicao(int i) {
         return this.ponto[i];
     }
 
-    public void setDesconhecido(boolean desconhecido) {
-        this.desconhecido = desconhecido;
-    }
 
-    public String[] arrayToStringArray() {
-        String exemplo[] = new String[this.ponto.length];
-        for(int i=0; i<this.ponto.length; i++) {
-            exemplo[i] = Double.toString(this.ponto[i]);
-        }
-        return exemplo;
-    }
+
 
     public String arrayToString() {
         String exemplo = Double.toString(this.ponto[0]);

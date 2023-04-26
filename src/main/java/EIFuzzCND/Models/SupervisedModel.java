@@ -7,6 +7,12 @@ import org.apache.commons.math3.ml.clustering.FuzzyKMeansClusterer;
 import weka.core.Instance;
 import weka.core.Instances;
 
+import weka.filters.Filter;
+import weka.filters.supervised.instance.Resample;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import java.util.*;
 
 public class SupervisedModel {
@@ -31,6 +37,7 @@ public class SupervisedModel {
     }
 
     public void trainInitialModel(Instances trainSet) throws Exception {
+
         List<Example> chunk = new ArrayList<>();
         for(int i=0; i<trainSet.size(); i++) {
             Example ex = new Example(trainSet.instance(i).toDoubleArray(), true);
@@ -89,7 +96,6 @@ public class SupervisedModel {
         int indexMaxTip = tipicidades.indexOf(maxValTip);
 
         Double maxValPer = Collections.max(pertinencia);
-        int indexMaxPer = pertinencia.indexOf(maxValPer);
 
         SPFMiC spfmic = auxSPFMiCs.get(indexMaxTip);
         int index = spfMiCS.indexOf(spfmic);
@@ -138,6 +144,29 @@ public class SupervisedModel {
     }
 
 
+
+    public void removeObsoleteGroups(int tempoLimite, int current_time) {
+        List<Double> labelsToRemove = new ArrayList<>();
+        for (Double label : classifier.keySet()) {
+            boolean labelUpdated = false;
+            for (SPFMiC spfmic : classifier.get(label)) {
+                double t = spfmic.getT();
+                double updated = spfmic.getUpdated();
+                if ((current_time - t) > tempoLimite || (current_time - updated) > tempoLimite) {
+                    spfmic.setObsolete(true);
+                } else {
+                    labelUpdated = true;
+                }
+            }
+            if (!labelUpdated) {
+                labelsToRemove.add(label);
+            };
+        }
+        for (Double label : labelsToRemove) {
+            classifier.remove(label);
+        }
+    }
+
     public void removeOldSPFMiCs(int ts, int currentTime) {
         for (int i = 0; i < classifier.size(); i++) {
             Map<Double, List<SPFMiC>> classifierOld = (Map<Double, List<SPFMiC>>) classifier.get(i);
@@ -158,5 +187,6 @@ public class SupervisedModel {
             }
         }
     }
+
 
 }

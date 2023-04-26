@@ -16,6 +16,7 @@ public class FuzzySystem {
         String dataset = "moa";
         String caminho = (new File(".")).getCanonicalPath() + "/datasets/" + dataset + "/";
 
+
         double fuzzyfication = 2;
         double alpha = 2;
         double theta = 1;
@@ -24,13 +25,12 @@ public class FuzzySystem {
         int T = 40;
         int minWeightOffline = 0;
         int minWeightOnline = 15;
-        int latencia = 10000000;// 2000, 5000, 10000,10000000
+        int []latencia = {10000000};// 2000, 5000, 10000,10000000
         int tChunk = 2000;
         int ts = 200;
 
-        double percentLabeled = 1.0;
-
         double phi = 0.4;
+        double percentLabeled = 1.0;
 
         ConverterUtils.DataSource source;
         Instances data;
@@ -43,11 +43,12 @@ public class FuzzySystem {
         chunks.add(data);
 
 
-        OfflinePhase offlinePhase = new OfflinePhase(dataset, caminho, fuzzyfication, alpha, theta, K, minWeightOffline);
-        SupervisedModel supervisedModel = offlinePhase.inicializar(data);
-        OnlinePhase onlinePhase = new OnlinePhase(caminho, supervisedModel, latencia, tChunk, T, kshort, phi, ts, minWeightOnline,percentLabeled);
-        onlinePhase.initialize(dataset);
-
+        for (int i = 0; i < latencia.length; i++) {
+            OfflinePhase offlinePhase = new OfflinePhase(dataset, caminho, fuzzyfication, alpha, theta, K, minWeightOffline);
+            SupervisedModel supervisedModel = offlinePhase.inicializar(data);
+            OnlinePhase onlinePhase = new OnlinePhase(caminho, supervisedModel, latencia[i], tChunk, T, kshort, phi, ts, minWeightOnline, percentLabeled);
+            onlinePhase.initialize(dataset);
+        }
 
 
     }
