@@ -144,29 +144,6 @@ public class SupervisedModel {
     }
 
 
-
-    public void removeObsoleteGroups(int tempoLimite, int current_time) {
-        List<Double> labelsToRemove = new ArrayList<>();
-        for (Double label : classifier.keySet()) {
-            boolean labelUpdated = false;
-            for (SPFMiC spfmic : classifier.get(label)) {
-                double t = spfmic.getT();
-                double updated = spfmic.getUpdated();
-                if ((current_time - t) > tempoLimite || (current_time - updated) > tempoLimite) {
-                    spfmic.setObsolete(true);
-                } else {
-                    labelUpdated = true;
-                }
-            }
-            if (!labelUpdated) {
-                labelsToRemove.add(label);
-            };
-        }
-        for (Double label : labelsToRemove) {
-            classifier.remove(label);
-        }
-    }
-
     public void removeOldSPFMiCs(int ts, int currentTime) {
         for (int i = 0; i < classifier.size(); i++) {
             Map<Double, List<SPFMiC>> classifierOld = (Map<Double, List<SPFMiC>>) classifier.get(i);

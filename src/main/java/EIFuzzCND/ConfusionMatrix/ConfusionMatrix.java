@@ -1,5 +1,9 @@
 package EIFuzzCND.ConfusionMatrix;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -51,6 +55,32 @@ public class ConfusionMatrix {
             System.out.println();
         }
     }
+
+    public void saveMatrix(String dataset,int latencia, double percentLabeled) throws IOException {
+        FileWriter writer;
+        BufferedWriter buf_writer;
+        String current = (new File(".")).getCanonicalPath();
+        writer = new FileWriter(current + "/datasets" + "/" + dataset + "/graphics_data/" + dataset  + latencia + "-" + percentLabeled + "-matrix.csv");
+        buf_writer = new BufferedWriter(writer);
+
+        buf_writer.write("Classes,");
+        for (Double className : matrix.keySet()) {
+            buf_writer.write(className + ",");
+        }
+        buf_writer.newLine();
+
+        for (Double trueClass : matrix.keySet()) {
+            buf_writer.write(trueClass + ",");
+            for (Double predictedClass : matrix.keySet()) {
+                int count = matrix.get(trueClass).get(predictedClass);
+                buf_writer.write(count + ",");
+            }
+            buf_writer.newLine();
+        }
+
+        buf_writer.close();
+    }
+
 
 
     public Map<Double, List<Double>> getClassesWithNonZeroCount() {
@@ -209,6 +239,11 @@ public class ConfusionMatrix {
         }
         return count;
     }
+
+    public int getNumberOfClasses() {
+        return matrix.size();
+    }
+
 
 
 }

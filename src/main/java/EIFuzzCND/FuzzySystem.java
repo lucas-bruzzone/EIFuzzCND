@@ -25,12 +25,12 @@ public class FuzzySystem {
         int T = 40;
         int minWeightOffline = 0;
         int minWeightOnline = 15;
-        int []latencia = {10000000};// 2000, 5000, 10000,10000000
+        int []latencia = {2000, 5000, 10000};// 2000, 5000, 10000,10000000
         int tChunk = 2000;
         int ts = 200;
 
         double phi = 0.4;
-        double percentLabeled = 1.0;
+        double[] percentLabeled = {0.8,0.5};
 
         ConverterUtils.DataSource source;
         Instances data;
@@ -43,12 +43,27 @@ public class FuzzySystem {
         chunks.add(data);
 
 
+
         for (int i = 0; i < latencia.length; i++) {
-            OfflinePhase offlinePhase = new OfflinePhase(dataset, caminho, fuzzyfication, alpha, theta, K, minWeightOffline);
-            SupervisedModel supervisedModel = offlinePhase.inicializar(data);
-            OnlinePhase onlinePhase = new OnlinePhase(caminho, supervisedModel, latencia[i], tChunk, T, kshort, phi, ts, minWeightOnline, percentLabeled);
-            onlinePhase.initialize(dataset);
+            boolean condicaoSatisfeita = false;
+            while (!condicaoSatisfeita) {
+                for (double labeled : percentLabeled) {
+                    OfflinePhase offlinePhase = new OfflinePhase(dataset, caminho, fuzzyfication, alpha, theta, K, minWeightOffline);
+                    SupervisedModel supervisedModel = offlinePhase.inicializar(data);
+                    OnlinePhase onlinePhase = new OnlinePhase(caminho, supervisedModel, latencia[i], tChunk, T, kshort, phi, ts, minWeightOnline, labeled);
+                    onlinePhase.initialize(dataset);
+                    if (onlinePhase.getTamConfusion() > 9) {
+                        // Condição satisfeita, executar novamente para a mesma latência
+                    } else {
+                        // Condição não satisfeita, passa para a próxima latência
+                        System.out.println("Latência " + latencia[i] + "Labeled  "+ labeled);
+                        condicaoSatisfeita = true;
+                        break;
+                    }
+                }
+            }
         }
+
 
 
     }

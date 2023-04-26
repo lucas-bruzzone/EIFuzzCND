@@ -32,6 +32,7 @@ public class OnlinePhase {
     private double percentLabeled;
     List<Example> results = new ArrayList<>();
     private double divisor = 1000;
+    private int tamConfusion;
     public OnlinePhase(String caminho, SupervisedModel supervisedModel, int latencia, int tChunk, int T, int kShort, double phi, int ts, int minWeight,double percentLabeled) {
         this.caminho = caminho;
         this.supervisedModel = supervisedModel;
@@ -84,11 +85,16 @@ public class OnlinePhase {
             for(int tempo = 0, tempoLatencia = 0; tempo <data.size(); tempo++, tempoLatencia++) {
                 Instance ins = data.get(tempo);
                 Example exemplo = new Example(ins.toDoubleArray(), true, tempo);
+
                 double rotulo = this.supervisedModel.classifyNew(ins, tempo);
+
+
                 exemplo.setRotuloClassificado(rotulo);
                 if (rotulo == -1) {
+
                     rotulo = notSupervisedModel.classify(exemplo, this.supervisedModel.K, tempo);
                     exemplo.setRotuloClassificado(rotulo);
+
                     if(rotulo == -1) {
                         unkMem.add(exemplo);
                         if (unkMem.size() >= T) {
@@ -115,13 +121,13 @@ public class OnlinePhase {
 
 
                 supervisedModel.removeOldSPFMiCs(latencia + ts, tempo);
-                notSupervisedModel.removeOldSPFMiCs(latencia+ts, tempo);
+                //notSupervisedModel.removeOldSPFMiCs(latencia+ts, tempo);
                 this.removeOldUnknown(unkMem, ts, tempo);
 
 
                 if ( tempo > 0 && tempo%divisor == 0) {
-                    confusionMatrix.mergeClasses(confusionMatrix.getClassesWithNonZeroCount());
                     metrics = confusionMatrix.calculateMetrics(tempo,confusionMatrix.countUnknow(),divisor);
+                    confusionMatrix.mergeClasses(confusionMatrix.getClassesWithNonZeroCount());
                     listaMetricas.add(metrics);
                     if (existNovelty) {
                         novelties.add(1.0);
@@ -132,16 +138,18 @@ public class OnlinePhase {
                 }
             }
 
+            confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
+
+            tamConfusion = confusionMatrixOriginal.getNumberOfClasses();
+
             // Salva todas as métricas no arquivo
             for (Metrics metrica : listaMetricas) {
                 HandlesFiles.salvaMetrics((int) (metrica.getTempo()/divisor), metrica.getAccuracy(), metrica.getPrecision(), metrica.getRecall(), metrica.getF1Score(), dataset, latencia, percentLabeled, metrica.getUnkMem(),metrica.getUnknownRate(), append);
                 append = true;
             }
 
-            confusionMatrixOriginal.printMatrix();
             HandlesFiles.salvaNovidades(novelties, dataset,latencia,percentLabeled);
             HandlesFiles.salvaResultados(results, dataset,latencia,percentLabeled);
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -211,8 +219,10 @@ public class OnlinePhase {
                                 }
                             }
 
-                            sfMiCS.get(i).setRotuloReal(maiorRotulo);
-                            notSupervisedModel.spfMiCS.add(sfMiCS.get(i));
+                            if (maiorRotulo == sfMiCS.get(i).getRotulo()) {
+                                sfMiCS.get(i).setRotuloReal(maiorRotulo);
+                                notSupervisedModel.spfMiCS.add(sfMiCS.get(i));
+                            }
 
                         } else {
                             existNovelty = true;
@@ -275,5 +285,11 @@ public class OnlinePhase {
     }
 
 
+    public int getTamConfusion() {
+        return tamConfusion;
+    }
 
+    public void setTamConfusion(int tamConfusion) {
+        this.tamConfusion = tamConfusion;
+    }
 }
