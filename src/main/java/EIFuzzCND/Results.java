@@ -18,9 +18,9 @@ public class Results {
 
     public static void main(String[] args) throws IOException, ParseException {
         String current = (new File(".")).getCanonicalPath();
-        String dataset = "moa";
-        String[] latencia = {"2000","5000","10000"};//"2000","5000","10000","10000000"
-        String percentedLabeled = "0.5";
+        String dataset = "kdd";
+        String[] latencia = {"2000","5000","10000","10000000"};//"2000","5000","10000","10000000"
+        String percentedLabeled = "1.0";
         Map<Integer, List<ResultsForExample>> resultsEIFuzzCND = new HashMap<>();
         ArrayList<Double> novidades;
         for (int i = 0; i < latencia.length; i++) {

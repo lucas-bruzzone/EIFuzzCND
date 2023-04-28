@@ -141,7 +141,7 @@ public class OnlinePhase {
             confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
 
             tamConfusion = confusionMatrixOriginal.getNumberOfClasses();
-
+            confusionMatrixOriginal.printMatrix();
             // Salva todas as métricas no arquivo
             for (Metrics metrica : listaMetricas) {
                 HandlesFiles.salvaMetrics((int) (metrica.getTempo()/divisor), metrica.getAccuracy(), metrica.getPrecision(), metrica.getRecall(), metrica.getF1Score(), dataset, latencia, percentLabeled, metrica.getUnkMem(),metrica.getUnknownRate(), append);
