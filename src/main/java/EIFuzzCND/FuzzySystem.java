@@ -13,23 +13,23 @@ import java.util.List;
 
 public class FuzzySystem {
     public static void main(String[] args) throws IOException, Exception {
-        String dataset = "kdd";
+        String dataset = "2-rbf";
         String caminho = (new File(".")).getCanonicalPath() + "/datasets/" + dataset + "/";
 
 
         double fuzzyfication = 2;
         double alpha = 2;
         double theta = 1;
-        int K = 8;
-        int kshort = 8; // número de clusters
-        int T = 80;
+        int K = 4;
+        int kshort = 4; // número de clusters
+        int T = 40;
         int minWeightOffline = 0;
-        int minWeightOnline = 30;
-        int []latencia = {10000000,2000, 5000, 10000};// 2000, 5000, 10000,10000000
-        int tChunk = 2000;
+        int minWeightOnline = 15;
+        int [] latencia = {10000000};// 2000, 5000, 10000,10000000
+        int tChunk = 500;
         int ts = 200;
 
-        double phi = 0.8;
+        double phi = 0.18;
         double[] percentLabeled = {1.0};
 
         ConverterUtils.DataSource source;
@@ -52,7 +52,7 @@ public class FuzzySystem {
                     SupervisedModel supervisedModel = offlinePhase.inicializar(data);
                     OnlinePhase onlinePhase = new OnlinePhase(caminho, supervisedModel, latencia[i], tChunk, T, kshort, phi, ts, minWeightOnline, labeled);
                     onlinePhase.initialize(dataset);
-                    if (onlinePhase.getTamConfusion() > 20) {
+                    if (onlinePhase.getTamConfusion() > 10) {
                         // Condição satisfeita, executar novamente para a mesma latência
                     } else {
                         // Condição não satisfeita, passa para a próxima latência

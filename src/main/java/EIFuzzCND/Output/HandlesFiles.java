@@ -60,6 +60,7 @@ public class HandlesFiles {
 
 
 
+
     public static ArrayList<ResultsForExample> loadResults(String caminho, int numAnalises) {
         BufferedReader inReader = null;
         try {

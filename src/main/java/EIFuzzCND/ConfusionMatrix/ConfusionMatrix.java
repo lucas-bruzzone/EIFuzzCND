@@ -1,9 +1,6 @@
 package EIFuzzCND.ConfusionMatrix;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 
@@ -56,19 +53,57 @@ public class ConfusionMatrix {
         }
     }
 
-    public void saveMatrix(String dataset,int latencia, double percentLabeled) throws IOException {
+
+    public void saveMatrix(String dataset, int latencia, double percentLabeled) throws IOException {
+        String current = (new File(".")).getCanonicalPath();
+        String filePath = current + "/datasets/" + dataset + "/graphics_data/" + dataset + latencia + "-" + percentLabeled + "-matrix.csv";
+
+        File file = new File(filePath);
+
         FileWriter writer;
         BufferedWriter buf_writer;
-        String current = (new File(".")).getCanonicalPath();
-        writer = new FileWriter(current + "/datasets" + "/" + dataset + "/graphics_data/" + dataset  + latencia + "-" + percentLabeled + "-matrix.csv");
-        buf_writer = new BufferedWriter(writer);
 
-        buf_writer.write("Classes,");
-        for (Double className : matrix.keySet()) {
-            buf_writer.write(className + ",");
+        // Verifica se o arquivo já existe
+        if (file.exists()) {
+            // Se o arquivo já existe, abre-o para leitura
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+
+            // Lê o conteúdo existente
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+            reader.close();
+
+            // Abre o arquivo em modo de escrita, mas mantendo o conteúdo existente
+            writer = new FileWriter(file, true);
+            buf_writer = new BufferedWriter(writer);
+            buf_writer.newLine();
+            // Escreve o cabeçalho do arquivo
+            buf_writer.write("Classes,");
+            for (Double className : matrix.keySet()) {
+                buf_writer.write(className + ",");
+            }
+            // Escreve abaixo do conteúdo existente
+            if (content.length() > 0) {
+                buf_writer.newLine();
+            }
+
+        } else {
+            // Se o arquivo não existe, cria um novo arquivo
+            writer = new FileWriter(file);
+            buf_writer = new BufferedWriter(writer);
+
+            // Escreve o cabeçalho do arquivo
+            buf_writer.write("Classes,");
+            for (Double className : matrix.keySet()) {
+                buf_writer.write(className + ",");
+            }
+            buf_writer.newLine();
         }
-        buf_writer.newLine();
 
+        // Escreve os dados na matriz
         for (Double trueClass : matrix.keySet()) {
             buf_writer.write(trueClass + ",");
             for (Double predictedClass : matrix.keySet()) {
@@ -78,8 +113,12 @@ public class ConfusionMatrix {
             buf_writer.newLine();
         }
 
+        // Fecha o escritor do arquivo
         buf_writer.close();
     }
+
+
+
 
 
 

@@ -79,22 +79,25 @@ public class OnlinePhase {
             //intermediaria
             esperandoTempo = data;
             List<Example> labeledMem = new ArrayList<>();
-
+            Set<Double> trueLabels = new HashSet<>();
 
 
             for(int tempo = 0, tempoLatencia = 0; tempo <data.size(); tempo++, tempoLatencia++) {
                 Instance ins = data.get(tempo);
                 Example exemplo = new Example(ins.toDoubleArray(), true, tempo);
-
                 double rotulo = this.supervisedModel.classifyNew(ins, tempo);
-
-
                 exemplo.setRotuloClassificado(rotulo);
-                if (rotulo == -1) {
 
+                // Verifica se o rótulo verdadeiro é novo
+                if (!trueLabels.contains(exemplo.getRotuloVerdadeiro()) || confusionMatrixOriginal.getNumberOfClasses() != tamConfusion) {
+                    trueLabels.add(exemplo.getRotuloVerdadeiro());
+                    tamConfusion = confusionMatrixOriginal.getNumberOfClasses();
+                    confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
+                }
+
+                if (rotulo == -1) {
                     rotulo = notSupervisedModel.classify(exemplo, this.supervisedModel.K, tempo);
                     exemplo.setRotuloClassificado(rotulo);
-
                     if(rotulo == -1) {
                         unkMem.add(exemplo);
                         if (unkMem.size() >= T) {
@@ -119,15 +122,14 @@ public class OnlinePhase {
                     nExeTemp++;
                 }
 
-
                 supervisedModel.removeOldSPFMiCs(latencia + ts, tempo);
                 //notSupervisedModel.removeOldSPFMiCs(latencia+ts, tempo);
                 this.removeOldUnknown(unkMem, ts, tempo);
 
-
                 if ( tempo > 0 && tempo%divisor == 0) {
-                    metrics = confusionMatrix.calculateMetrics(tempo,confusionMatrix.countUnknow(),divisor);
                     confusionMatrix.mergeClasses(confusionMatrix.getClassesWithNonZeroCount());
+                    metrics = confusionMatrix.calculateMetrics(tempo,confusionMatrix.countUnknow(),divisor);
+                    System.out.println("Tempo:" + tempo + " Acurácia: " + metrics.getAccuracy() + " Precision: " + metrics.getPrecision() );
                     listaMetricas.add(metrics);
                     if (existNovelty) {
                         novelties.add(1.0);
@@ -138,7 +140,7 @@ public class OnlinePhase {
                 }
             }
 
-            confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
+            //confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
 
             tamConfusion = confusionMatrixOriginal.getNumberOfClasses();
             confusionMatrixOriginal.printMatrix();
@@ -150,6 +152,7 @@ public class OnlinePhase {
 
             HandlesFiles.salvaNovidades(novelties, dataset,latencia,percentLabeled);
             HandlesFiles.salvaResultados(results, dataset,latencia,percentLabeled);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

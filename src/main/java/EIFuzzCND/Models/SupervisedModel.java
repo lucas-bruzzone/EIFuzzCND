@@ -37,7 +37,6 @@ public class SupervisedModel {
     }
 
     public void trainInitialModel(Instances trainSet) throws Exception {
-
         List<Example> chunk = new ArrayList<>();
         for(int i=0; i<trainSet.size(); i++) {
             Example ex = new Example(trainSet.instance(i).toDoubleArray(), true);
