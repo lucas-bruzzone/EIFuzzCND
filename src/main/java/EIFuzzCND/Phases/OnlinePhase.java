@@ -140,7 +140,7 @@ public class OnlinePhase {
                 }
             }
 
-            //confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
+            confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
 
             tamConfusion = confusionMatrixOriginal.getNumberOfClasses();
             confusionMatrixOriginal.printMatrix();

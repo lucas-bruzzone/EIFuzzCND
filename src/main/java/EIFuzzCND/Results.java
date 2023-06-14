@@ -18,8 +18,8 @@ public class Results {
 
     public static void main(String[] args) throws IOException, ParseException {
         String current = (new File(".")).getCanonicalPath();
-        String dataset = "rbf";
-        String[] latencia = {"10000000"};//"2000","5000","10000","10000000"
+        String dataset = "kdd";
+        String[] latencia = {"2000","5000","10000"};//"2000","5000","10000","10000000"
         String percentedLabeled = "1.0";
         Map<Integer, List<ResultsForExample>> resultsEIFuzzCND = new HashMap<>();
         ArrayList<Double> novidades;
@@ -60,7 +60,7 @@ public class Results {
             rotulos.add("Accuracy");
             rotulos.add("unknownRate");
 
-            metricasFuzzCND.add(precisoesFuzzCND);
+            metricasFuzzCND.add(acuraciasFuzzCND);
             metricasFuzzCND.add(unknownRate);
 
 
