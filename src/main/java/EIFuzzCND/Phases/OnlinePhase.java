@@ -92,7 +92,7 @@ public class OnlinePhase {
                 if (!trueLabels.contains(exemplo.getRotuloVerdadeiro()) || confusionMatrixOriginal.getNumberOfClasses() != tamConfusion) {
                     trueLabels.add(exemplo.getRotuloVerdadeiro());
                     tamConfusion = confusionMatrixOriginal.getNumberOfClasses();
-                    confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
+                    //confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
                 }
 
                 if (rotulo == -1) {
@@ -108,7 +108,7 @@ public class OnlinePhase {
 
                 results.add(exemplo);
                 confusionMatrix.addInstance(exemplo.getRotuloVerdadeiro(),exemplo.getRotuloClassificado());
-                confusionMatrixOriginal.addInstance(exemplo.getRotuloVerdadeiro(),exemplo.getRotuloClassificado());
+                //confusionMatrixOriginal.addInstance(exemplo.getRotuloVerdadeiro(),exemplo.getRotuloClassificado());
 
                 if(tempoLatencia >= latencia) {
                     if (Math.random() < percentLabeled || labeledMem.isEmpty()) {
@@ -140,10 +140,10 @@ public class OnlinePhase {
                 }
             }
 
-            confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
+            //confusionMatrixOriginal.saveMatrix(dataset,latencia,percentLabeled);
 
-            tamConfusion = confusionMatrixOriginal.getNumberOfClasses();
-            confusionMatrixOriginal.printMatrix();
+            //tamConfusion = confusionMatrixOriginal.getNumberOfClasses();
+            //confusionMatrixOriginal.printMatrix();
             // Salva todas as métricas no arquivo
             for (Metrics metrica : listaMetricas) {
                 HandlesFiles.salvaMetrics((int) (metrica.getTempo()/divisor), metrica.getAccuracy(), metrica.getPrecision(), metrica.getRecall(), metrica.getF1Score(), dataset, latencia, percentLabeled, metrica.getUnkMem(),metrica.getUnknownRate(), append);
@@ -201,7 +201,7 @@ public class OnlinePhase {
                                 double trueLabel = examples.get(j).getRotuloVerdadeiro();
                                 double predictedLabel = sfMiCS.get(i).getRotulo();
                                 updateConfusionMatrix(trueLabel,predictedLabel,confusionMatrix);
-                                updateConfusionMatrix(trueLabel,predictedLabel,confusionMatrixOriginal);
+                                //updateConfusionMatrix(trueLabel,predictedLabel,confusionMatrixOriginal);
 
 
                                 if (rotulos.containsKey(examples.get(j).getRotuloVerdadeiro())) {
@@ -237,7 +237,7 @@ public class OnlinePhase {
                                 double trueLabel = examples.get(j).getRotuloVerdadeiro();
                                 double predictedLabel = sfMiCS.get(i).getRotulo();
                                 updateConfusionMatrix(trueLabel,predictedLabel,confusionMatrix);
-                                updateConfusionMatrix(trueLabel,predictedLabel,confusionMatrixOriginal);
+                                //updateConfusionMatrix(trueLabel,predictedLabel,confusionMatrixOriginal);
                                 if (rotulos.containsKey(examples.get(j).getRotuloVerdadeiro())) {
                                     rotulos.put(examples.get(j).getRotuloVerdadeiro(), rotulos.get(examples.get(j).getRotuloVerdadeiro()) + 1);
                                 } else {

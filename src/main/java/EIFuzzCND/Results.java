@@ -18,61 +18,61 @@ public class Results {
 
     public static void main(String[] args) throws IOException, ParseException {
         String current = (new File(".")).getCanonicalPath();
-        String dataset = "kdd";
-        String[] latencia = {"2000","5000","10000"};//"2000","5000","10000","10000000"
-        String percentedLabeled = "1.0";
+        String dataset = "cover";
+        String[] latencia = {"10000"};//"2000","5000","10000","10000000"
+        String[] percentedLabeled = {"0.2", "0.5", "0.8"};
         Map<Integer, List<ResultsForExample>> resultsEIFuzzCND = new HashMap<>();
         ArrayList<Double> novidades;
         for (int i = 0; i < latencia.length; i++) {
+            for (int j = 0; j < percentedLabeled.length; j++) {
 
-            String caminhoTrain = current + "/datasets/" + dataset + "/" + dataset + "-train.csv";
-            String caminhoResultados = current + "/datasets/" + dataset + "/graphics_data/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-results.csv";
-            String caminhoNovidades = current + "/datasets/" + dataset + "/graphics_data/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-novelties.csv";
-            String caminhoAcuracia = current + "/datasets/" + dataset + "/graphics_data/" + dataset + latencia[i] + "-" + percentedLabeled + "-EIFuzzCND-acuracia.csv";
+                String caminhoTrain = current + "/datasets/" + dataset + "/" + dataset + "-train.csv";
+                String caminhoResultados = current + "/datasets/" + dataset + "/graphics_data/" + dataset + latencia[i] + "-" + percentedLabeled[j] + "-EIFuzzCND-results.csv";
+                String caminhoNovidades = current + "/datasets/" + dataset + "/graphics_data/" + dataset + latencia[i] + "-" + percentedLabeled[j] + "-EIFuzzCND-novelties.csv";
+                String caminhoAcuracia = current + "/datasets/" + dataset + "/graphics_data/" + dataset + latencia[i] + "-" + percentedLabeled[j] + "-EIFuzzCND-acuracia.csv";
 
 
-            ArrayList<Double> classesTreinamento = checkLastColumn(caminhoTrain);
-            Integer countResults = countLinesInCsv(caminhoResultados);
-            Integer countNovelties = countLinesInCsv(caminhoNovidades);
-            Integer countAcuracias = countLinesInCsv(caminhoAcuracia);
-            ArrayList<Integer> novasClasses = storeLines(caminhoResultados, classesTreinamento);
-            for (int j = 0; j < 1; j++) {
-                resultsEIFuzzCND.put(j, HandlesFiles.loadResults(caminhoResultados, countResults));
+                ArrayList<Double> classesTreinamento = checkLastColumn(caminhoTrain);
+                Integer countResults = countLinesInCsv(caminhoResultados);
+                Integer countNovelties = countLinesInCsv(caminhoNovidades);
+                Integer countAcuracias = countLinesInCsv(caminhoAcuracia);
+                ArrayList<Integer> novasClasses = storeLines(caminhoResultados, classesTreinamento);
+                for (int k = 0; k < 1; k++) {
+                    resultsEIFuzzCND.put(k, HandlesFiles.loadResults(caminhoResultados, countResults));
+                }
+
+                novidades = HandlesFiles.loadNovelties(caminhoNovidades, countNovelties);
+
+
+                ArrayList<Double> precisoesFuzzCND = new ArrayList<>();
+                ArrayList<Double> recallsFuzzCND = new ArrayList<>();
+                ArrayList<Double> f1ScoresFuzzCND = new ArrayList<>();
+                ArrayList<Double> unknownRate = new ArrayList<>();
+                ArrayList<Double> acuraciasFuzzCND = new ArrayList<>();
+                ArrayList<Double> unkRFuzzCND = new ArrayList<>();
+
+                HandlesFiles.loadMetrics(caminhoAcuracia, countAcuracias, acuraciasFuzzCND, precisoesFuzzCND, recallsFuzzCND, f1ScoresFuzzCND, unkRFuzzCND, unknownRate);
+
+                ArrayList<List<Double>> metricasFuzzCND = new ArrayList<>();
+
+
+                List<String> rotulos = new ArrayList<>();
+                rotulos.add("Accuracy");
+                rotulos.add("unknownRate");
+
+                metricasFuzzCND.add(precisoesFuzzCND);
+                metricasFuzzCND.add(unknownRate);
+
+
+                LineChart_AWT chart2 = new LineChart_AWT(
+                        latencia[i],
+                        latencia[i], metricasFuzzCND, rotulos, novidades, novasClasses, dataset, percentedLabeled[j]);
+
+                chart2.pack();
+                RefineryUtilities.centerFrameOnScreen(chart2);
+                chart2.setVisible(true);
             }
-
-            novidades = HandlesFiles.loadNovelties(caminhoNovidades, countNovelties);
-
-
-            ArrayList<Double> precisoesFuzzCND = new ArrayList<>();
-            ArrayList<Double> recallsFuzzCND = new ArrayList<>();
-            ArrayList<Double> f1ScoresFuzzCND = new ArrayList<>();
-            ArrayList<Double> unknownRate = new ArrayList<>();
-            ArrayList<Double> acuraciasFuzzCND = new ArrayList<>();
-            ArrayList<Double> unkRFuzzCND = new ArrayList<>();
-
-            HandlesFiles.loadMetrics(caminhoAcuracia, countAcuracias, acuraciasFuzzCND, precisoesFuzzCND, recallsFuzzCND, f1ScoresFuzzCND, unkRFuzzCND, unknownRate);
-
-            ArrayList<List<Double>> metricasFuzzCND = new ArrayList<>();
-
-
-
-            List<String> rotulos = new ArrayList<>();
-            rotulos.add("Accuracy");
-            rotulos.add("unknownRate");
-
-            metricasFuzzCND.add(acuraciasFuzzCND);
-            metricasFuzzCND.add(unknownRate);
-
-
-            LineChart_AWT chart2 = new LineChart_AWT(
-                    latencia[i],
-                    latencia[i], metricasFuzzCND, rotulos, novidades, novasClasses,dataset,percentedLabeled);
-
-            chart2.pack();
-            RefineryUtilities.centerFrameOnScreen(chart2);
-            chart2.setVisible(true);
         }
-
     }
 
 
