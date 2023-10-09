@@ -26,7 +26,7 @@ Na Fase Offline, o algoritmo realiza as seguintes tarefas:
 2. Treinamento de cada subconjunto utilizando Fuzzy C-Means Clustering
 3. Sumarização e criação dos micro-grupos (SPFMiCs) gerando o Modelo de classes conhecidas (MCC)
 
-### Documentação em PDF
+### Fluxograma em PDF
 
 Você pode acessar a documentação em PDF [aqui](https://github.com/lucas-bruzzone/EIFuzzCND/raw/main/graphics/_Fluxograma%20Fase%20Offline.pdf).
 
@@ -40,7 +40,7 @@ Na Fase Online, o algoritmo está em execução contínua e realiza a detecção
 3. Detecção de novidadedes e manutenção do MCD
 4. Atualização da matriz de confusão incremental (MCI)
 
-### Documentação em PDF
+### Fluxograma em PDF
 
 Você pode acessar a documentação em PDF [aqui](https://github.com/lucas-bruzzone/EIFuzzCND/raw/main/graphics/_Fluxograma%20Fase%20Online.pdf).
 
