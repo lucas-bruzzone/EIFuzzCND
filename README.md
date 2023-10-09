@@ -8,11 +8,11 @@ O EIFuzzCND é uma evolução do algoritmo EFuzzCND, que pode ser encontrado [ne
 
 ### 1. Abordagem Incremental
 
-Uma das principais melhorias implementadas no EIFuzzCND é a introdução de uma abordagem incremental no algoritmo supervisionado. Isso foi feito com o propósito de lidar de forma mais eficaz com desvios de conceito nos dados de entrada. Através dessa abordagem, o algoritmo é capaz de se adaptar continuamente às mudanças nos padrões de dados, garantindo uma detecção de novidades mais precisa.
+Uma das principais melhorias implementadas no EIFuzzCND é a introdução de uma abordagem incremental no Modelo de Classes Conhecidas (MCC). Isso foi feito com o propósito de lidar de forma mais eficaz com desvios de conceito nos dados de entrada. Através dessa abordagem, o algoritmo é capaz de se adaptar continuamente às mudanças nos padrões de dados, garantindo uma detecção de novidades mais precisa.
 
 ### 2. Latência Intermediária
 
-Outra importante melhoria no EIFuzzCND é a modificação da forma como o algoritmo se comporta em cenários de latência intermediária. Diferentemente de abordagens tradicionais, este algoritmo não exige o retorno de todos os rótulos verdadeiros ao fluxo de dados em tempo real. Isso proporciona uma maior eficiência no processamento de dados, reduzindo a sobrecarga de comunicação e melhorando a velocidade de detecção de novidades.
+Outra importante melhoria no EIFuzzCND é a modificação da forma como o algoritmo se comporta em cenários de latência intermediária. Diferentemente de abordagens tradicionais, este algoritmo não exige o retorno de todos os rótulos verdadeiros ao fluxo de dados em tempo real. Isso proporciona uma maior eficiência no processamento de dados, gerando mais robustez na tarefa de detecção de novidades.
 
 ## Fases do Algoritmo
 
@@ -47,7 +47,6 @@ Você pode acessar a documentação em PDF [aqui](https://github.com/lucas-bruzz
 ### Dissertação ( Ainda sem correções finais ) 
 
 A dissertação completa pode ser encontrada [aqui](https://github.com/lucas-bruzzone/EIFuzzCND/blob/main/Dissertação_Mestrado.pdf).
-
 
 
 ## Autores
