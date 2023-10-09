@@ -14,6 +14,35 @@ Uma das principais melhorias implementadas no EIFuzzCND é a introdução de uma
 
 Outra importante melhoria no EIFuzzCND é a modificação da forma como o algoritmo se comporta em cenários de latência intermediária. Diferentemente de abordagens tradicionais, este algoritmo não exige o retorno de todos os rótulos verdadeiros ao fluxo de dados em tempo real. Isso proporciona uma maior eficiência no processamento de dados, reduzindo a sobrecarga de comunicação e melhorando a velocidade de detecção de novidades.
 
+## Fases do Algoritmo
+
+O EIFuzzCND opera em duas fases distintas: Fase Offline e Fase Online. Abaixo, você encontrará uma explicação detalhada de cada uma delas, juntamente com os fluxogramas correspondentes.
+
+### Fase Offline
+
+Na Fase Offline, o algoritmo realiza as seguintes tarefas:
+
+1. Preprocessamento dos dados de treinamento.
+2. Treinamento do modelo inicial.
+3. Adaptação contínua do modelo a novos padrões de dados.
+
+A imagem a seguir ilustra o fluxograma da Fase Offline:
+
+![Fluxograma Fase Offline](https://github.com/lucas-bruzzone/EIFuzzCND/raw/main/graphics/_Fluxograma%20Fase%20Offline.pdf)
+
+### Fase Online
+
+Na Fase Online, o algoritmo está em execução contínua e realiza a detecção de novidades em tempo real. As etapas incluem:
+
+1. Captura de dados em fluxo.
+2. Detecção de novidades com base no modelo adaptado.
+3. Tomada de decisões em tempo real.
+
+A imagem a seguir ilustra o fluxograma da Fase Online:
+
+![Fluxograma Fase Online](https://github.com/lucas-bruzzone/EIFuzzCND/raw/main/graphics/_Fluxograma%20Fase%20Online.pdf)
+
+
 
 ## Autores
 
