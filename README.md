@@ -44,6 +44,11 @@ Na Fase Online, o algoritmo está em execução contínua e realiza a detecção
 
 Você pode acessar a documentação em PDF [aqui](https://github.com/lucas-bruzzone/EIFuzzCND/raw/main/graphics/_Fluxograma%20Fase%20Online.pdf).
 
+### Dissertação ( Ainda sem correções finais ) 
+
+A dissertação completa pode ser encontrada [aqui](https://github.com/lucas-bruzzone/EIFuzzCND/blob/main/Dissertação_Mestrado.pdf).
+
+
 
 ## Autores
 
