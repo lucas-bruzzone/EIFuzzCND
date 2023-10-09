@@ -22,26 +22,27 @@ O EIFuzzCND opera em duas fases distintas: Fase Offline e Fase Online. Abaixo, v
 
 Na Fase Offline, o algoritmo realiza as seguintes tarefas:
 
-1. Preprocessamento dos dados de treinamento.
-2. Treinamento do modelo inicial.
-3. Adaptação contínua do modelo a novos padrões de dados.
+1. Separação do conjunto de treinamento rotulado por classe
+2. Treinamento de cada subconjunto utilizando Fuzzy C-Means Clustering
+3. Sumarização e criação dos micro-grupos (SPFMiCs) gerando o Modelo de classes conhecidas (MCC)
 
-A imagem a seguir ilustra o fluxograma da Fase Offline:
+### Documentação em PDF
 
-![Fluxograma Fase Offline](https://github.com/lucas-bruzzone/EIFuzzCND/raw/main/graphics/_Fluxograma%20Fase%20Offline.pdf)
+Você pode acessar a documentação em PDF [aqui](https://github.com/lucas-bruzzone/EIFuzzCND/raw/main/graphics/_Fluxograma%20Fase%20Offline.pdf).
+
 
 ### Fase Online
 
 Na Fase Online, o algoritmo está em execução contínua e realiza a detecção de novidades em tempo real. As etapas incluem:
 
-1. Captura de dados em fluxo.
-2. Detecção de novidades com base no modelo adaptado.
-3. Tomada de decisões em tempo real.
+1. Tentativa de classificação pelo MCC e Modelo de classes desconhecidas (MCD) 
+2. Abordagem incremental para atualização do MCC
+3. Detecção de novidadedes e manutenção do MCD
+4. Atualização da matriz de confusão incremental (MCI)
 
-A imagem a seguir ilustra o fluxograma da Fase Online:
+### Documentação em PDF
 
-![Fluxograma Fase Online](https://github.com/lucas-bruzzone/EIFuzzCND/raw/main/graphics/_Fluxograma%20Fase%20Online.pdf)
-
+Você pode acessar a documentação em PDF [aqui](https://github.com/lucas-bruzzone/EIFuzzCND/raw/main/graphics/_Fluxograma%20Fase%20Online.pdf).
 
 
 ## Autores
